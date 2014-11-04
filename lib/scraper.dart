@@ -6,14 +6,21 @@ import 'src/crawler.dart';
 const ROOT = 'http://coursepress.lnu.se';
 
 scrape() {
-    crawl('$ROOT/kurser', _nextPage, 're222dv').listen((_) => print('Got Stuff!'));
+    crawl('$ROOT/kurser', _nextPages, 're222dv').listen((p) => print('Got ${p.url}'));
 }
 
-String _nextPage(PageInfo<Document> document) {
-    if (!document.url.startsWith('$ROOT/kurser')) return null;
+Iterable<String> _nextPages(PageInfo<Document> document) {
+    if (!document.url.startsWith('$ROOT/kurser')) return [];
+    var nextPages = [];
 
-    var link = document.data.querySelector('a.next.page-numbers');
-    if (link == null) return null;
+    var nextLink = document.data.querySelector('a.next.page-numbers');
+    if (nextLink != null) nextPages.add(ROOT + nextLink.attributes['href']);
 
-    return ROOT + link.attributes['href'];
+    var courseLinks = document.data.querySelectorAll('.item-title a')
+        .map((a) => a.attributes['href'])
+        .where((link) => link.startsWith('$ROOT/kurs'));
+
+    nextPages.addAll(courseLinks);
+
+    return nextPages;
 }

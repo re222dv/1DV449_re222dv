@@ -6,7 +6,7 @@ import 'package:html5lib/parser.dart' show parse;
 import 'package:html5lib/dom.dart';
 import 'stream_functions.dart';
 
-typedef String NextPage(PageInfo<Document> document);
+typedef Iterable<String> NextPages(PageInfo<Document> document);
 
 class PageInfo<T> {
     String url;
@@ -31,7 +31,7 @@ httpParser(StreamController seed) => (PageInfo response) {
 
 PageInfo htmlParser(PageInfo page) => page..data = parse(page.data);
 
-Stream<PageInfo<Document>> crawl(String url, NextPage nextPage, [String userAgent]) {
+Stream<PageInfo<Document>> crawl(String url, NextPages nextPages, [String userAgent]) {
     var linksToGet = new StreamController<String>();
     var documents = linksToGet.stream
         .asyncMap(getPage(userAgent))
@@ -41,8 +41,9 @@ Stream<PageInfo<Document>> crawl(String url, NextPage nextPage, [String userAgen
         .asBroadcastStream();
 
     documents
-        .map(nextPage)
-        .where(notNull)
+        .map(nextPages)
+        .map((nextPages) => new Stream.fromIterable(nextPages))
+        .transform(flatten)
         .listen(linksToGet.add);
 
     linksToGet.add(url);
