@@ -1,5 +1,6 @@
 library scraper;
 
+import 'dart:async';
 import 'package:html5lib/dom.dart';
 import 'src/crawler.dart';
 
@@ -23,7 +24,9 @@ class Post {
     DateTime time;
 }
 
-scrape() {
+Stream<Course> scrape() {
+    var courses = new StreamController();
+
     crawl('$ROOT/kurser', _nextPages, 're222dv')
         .where((page) => page.url.startsWith('$ROOT/kurs/'))
         .listen((PageInfo<Document> page) {
@@ -38,12 +41,6 @@ scrape() {
                         orElse: () => null
                     )
                 ..description = page.data.querySelector('.entry-content>p').text;
-
-            print(course.name);
-            print(course.code);
-            print(course.url);
-            print(course.syllabusUrl);
-            print(course.description);
 
             var latestPost = page.data.querySelector('#latest-post').parent.nextElementSibling;
             if (latestPost != null) {
@@ -63,7 +60,11 @@ scrape() {
                         )
                 );
             }
-        });
+
+            courses.add(course);
+        }, onDone: courses.close);
+
+    return courses.stream;
 }
 
 Iterable<String> _nextPages(PageInfo<Document> document) {

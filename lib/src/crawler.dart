@@ -32,7 +32,7 @@ httpParser(StreamController seed) => (PageInfo response) {
 PageInfo htmlParser(PageInfo page) => page..data = parse(page.data);
 
 Stream<PageInfo<Document>> crawl(String url, NextPages nextPages, [String userAgent]) {
-    var linksToGet = new StreamController<String>();
+    var linksToGet = new StreamController<String>.broadcast();
     var documents = linksToGet.stream
         .asyncMap(getPage(userAgent))
         .map(httpParser(linksToGet))
@@ -45,6 +45,10 @@ Stream<PageInfo<Document>> crawl(String url, NextPages nextPages, [String userAg
         .map((nextPages) => new Stream.fromIterable(nextPages))
         .transform(flatten)
         .listen(linksToGet.add);
+
+    linksToGet.stream
+        .timeout(new Duration(seconds: 10), onTimeout: (_) => linksToGet.close())
+        .drain();
 
     linksToGet.add(url);
 
