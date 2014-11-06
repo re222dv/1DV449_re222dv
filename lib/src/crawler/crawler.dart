@@ -14,8 +14,8 @@ typedef Future<PageInfo<http.Response>> PageGetter(String url);
 typedef PageInfo<String> HttpParser(PageInfo<http.Response> response);
 
 class PageInfo<T> {
-    String url;
-    T data;
+    final String url;
+    final T data;
 
     PageInfo(this.url, this.data);
 }
@@ -54,15 +54,15 @@ PageGetter getPage([String userAgent]) => (url) =>
         .then((response) => new PageInfo(url, response));
 
 /// Returns a [HttpParser] that adds redirects to [linksToGet]
-HttpParser httpParser(StreamController linksToGet) => (PageInfo response) {
+HttpParser httpParser(StreamController linksToGet) => (PageInfo<http.Response> response) {
     if (response.data.isRedirect) {
         linksToGet.add(response.data.headers['Location']);
         return null;
     }
     if (response.data.statusCode != 200) throw 'Got status code ${response.data.statusCode}';
 
-    return response..data = response.data.body;
+    return new PageInfo(response.url, response.data.body);
 };
 
 /// Parses html and returns a DOM object
-PageInfo<Document> htmlParser(PageInfo page) => page..data = html.parse(page.data);
+PageInfo<Document> htmlParser(PageInfo<String> page) => new PageInfo(page.url, html.parse(page.data));
