@@ -11,6 +11,10 @@ Future<String> cacheToFile(String filename, Stream<Course> courses) =>
         .map(toJson)
         .map(noInformation)
         .toList()
+        .then((list) {
+            list.sort((a, b) => a['name'].compareTo(b['name']));
+            return list;
+        })
         .then(createWrapper)
         .then(JSON.encode)
         .then((json) =>

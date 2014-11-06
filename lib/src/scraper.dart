@@ -38,7 +38,7 @@ Course parseCourse(PageInfo<Document> coursePage) =>
         syllabusUrl: coursePage.data.querySelectorAll('a[href]')
             .map((a) => a.attributes['href'])
             .firstWhere(
-                    (href) => SYLLABUS_PATTERN.hasMatch(href),
+                (href) => SYLLABUS_PATTERN.hasMatch(href),
                 orElse: () => null
             ),
         latestPost: parseLatestPost(coursePage.data)
