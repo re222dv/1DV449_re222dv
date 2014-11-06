@@ -1,28 +1,9 @@
-library scraper;
-
-import 'dart:async';
-import 'package:html5lib/dom.dart';
-import 'src/crawler.dart';
+part of coursepress_scarper;
 
 const ROOT = 'http://coursepress.lnu.se';
 
 final DATE_PATTERN = new RegExp(r'(\d{4})\-(\d\d)\-(\d\d) (\d\d)\:(\d\d)');
 final SYLLABUS_PATTERN = new RegExp(r'(kursinfo\.lnu\.se/(utbildning/)?GenerateDocument\.ashx)|kursplan.lnu.se');
-
-class Course {
-    String name;
-    String code;
-    String url;
-    String syllabusUrl;
-    String description;
-    Post latestPost;
-}
-
-class Post {
-    String heading;
-    String author;
-    DateTime time;
-}
 
 /**
  * Scrapes CoursePress on Linnéaus University and returns a [Stream] of [Course]s

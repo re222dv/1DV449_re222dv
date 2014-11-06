@@ -4,5 +4,7 @@ description: A sample command-line application
 dependencies:
   http: any
   html5lib: any
+  RestLibrary:
+    git: https://github.com/Pajn/RestLibrary.git
 dev_dependencies:
 #  unittest: any
