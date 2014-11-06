@@ -2,11 +2,16 @@ library crawler;
 
 import 'dart:async';
 import 'package:http/http.dart' as http;
-import 'package:html5lib/parser.dart' show parse;
+import 'package:html5lib/parser.dart' as html show parse;
 import 'package:html5lib/dom.dart';
 import 'stream_functions.dart';
 
+/// A function that returns an [Iterable] with links that should be visited next
 typedef Iterable<String> NextPages(PageInfo<Document> document);
+/// A function that downloads a page
+typedef Future<PageInfo<http.Response>> PageGetter(String url);
+/// A function that parses http and returns the body or null
+typedef PageInfo<String> HttpParser(PageInfo<http.Response> response);
 
 class PageInfo<T> {
     String url;
@@ -15,22 +20,10 @@ class PageInfo<T> {
     PageInfo(this.url, this.data);
 }
 
-getPage(String userAgent) => (url) =>
-    http.get(url, headers: {'User-Agent': userAgent})
-        .then((response) => new PageInfo(url, response));
-
-httpParser(StreamController seed) => (PageInfo response) {
-    if (response.data.isRedirect) {
-        seed.add(response.data.headers['Location']);
-        return null;
-    }
-    if (response.data.statusCode != 200) throw 'Got status code ${response.data.statusCode}';
-
-    return response..data = response.data.body;
-};
-
-PageInfo htmlParser(PageInfo page) => page..data = parse(page.data);
-
+/**
+ * Crawls pages starting at [url] and continues to pages returned by [nextPages]
+ * Returns a [Stream] of [PageInfo] with the url and DOM object for each page visited
+ */
 Stream<PageInfo<Document>> crawl(String url, NextPages nextPages, [String userAgent]) {
     var linksToGet = new StreamController<String>.broadcast();
     var documents = linksToGet.stream
@@ -54,3 +47,22 @@ Stream<PageInfo<Document>> crawl(String url, NextPages nextPages, [String userAg
 
     return documents;
 }
+
+/// Returns a [PageGetter] that get pages with [userAgent]
+PageGetter getPage([String userAgent]) => (url) =>
+    http.get(url, headers: {'User-Agent': userAgent})
+        .then((response) => new PageInfo(url, response));
+
+/// Returns a [HttpParser] that adds redirects to [linksToGet]
+HttpParser httpParser(StreamController linksToGet) => (PageInfo response) {
+    if (response.data.isRedirect) {
+        linksToGet.add(response.data.headers['Location']);
+        return null;
+    }
+    if (response.data.statusCode != 200) throw 'Got status code ${response.data.statusCode}';
+
+    return response..data = response.data.body;
+};
+
+/// Parses html and returns a DOM object
+PageInfo<Document> htmlParser(PageInfo page) => page..data = html.parse(page.data);

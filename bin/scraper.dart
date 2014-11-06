@@ -43,7 +43,7 @@ Map asJson(Course course) => {
     'url': course.url,
     'syllabusUrl': course.syllabusUrl,
     'description': course.description,
-    'latestPost': course.latestPost == null ? 'no information' : {
+    'latestPost': course.latestPost == null ? null : {
         'heading': course.latestPost.heading,
         'author': course.latestPost.author,
         'time': course.latestPost.time.toIso8601String()
@@ -63,6 +63,6 @@ Function createWrapper(List courses) => (_) => {
     'timestamp': new DateTime.now().toIso8601String(),
 };
 
-saveToFile(String filename) => (json) =>
+Function saveToFile(String filename) => (json) =>
     new File(filename)
       .writeAsString(json, flush: true);

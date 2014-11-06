@@ -24,50 +24,39 @@ class Post {
     DateTime time;
 }
 
-Stream<Course> scrape() {
-    var courses = new StreamController();
-
-    crawl('$ROOT/kurser', _nextPages, 're222dv')
+/**
+ * Scrapes CoursePress on Linnéaus University and returns a [Stream] of [Course]s
+ */
+Stream<Course> scrape() =>
+    crawl('$ROOT/kurser', nextPages, 're222dv')
         .where((page) => page.url.startsWith('$ROOT/kurs/'))
-        .listen((PageInfo<Document> page) {
+        .map((PageInfo<Document> coursePage) {
+            var document = coursePage.data;
             var course = new Course()
-                ..name = page.data.querySelector('h1').text.trim()
-                ..code = page.data.querySelector('#header-wrapper ul li:last-child').text.trim()
-                ..url = page.url
-                ..syllabusUrl = page.data.querySelectorAll('a[href]')
+                ..name = document.querySelector('h1').text.trim()
+                ..code = document.querySelector('#header-wrapper ul li:last-child').text.trim()
+                ..url = coursePage.url
+                ..description = document.querySelector('.entry-content>p').text
+                ..syllabusUrl = document.querySelectorAll('a[href]')
                     .map((a) => a.attributes['href'])
                     .firstWhere(
                         (href) => SYLLABUS_PATTERN.hasMatch(href),
                         orElse: () => null
-                    )
-                ..description = page.data.querySelector('.entry-content>p').text;
+                    );
 
-            var latestPost = page.data.querySelector('#latest-post').parent.nextElementSibling;
+            var latestPost = document.querySelector('#latest-post').parent.nextElementSibling;
             if (latestPost != null) {
-                var dateMatch = DATE_PATTERN.firstMatch(latestPost.querySelector('.entry-byline').text);
-                course.latestPost = (
-                    new Post()
-                        ..heading = latestPost.querySelector('h1.entry-title').text
-                        ..author = latestPost.querySelector('.entry-byline strong').text
-                        ..time = (
-                            new DateTime.utc(
-                                int.parse(dateMatch.group(1)),
-                                int.parse(dateMatch.group(2)),
-                                int.parse(dateMatch.group(3)),
-                                int.parse(dateMatch.group(4)),
-                                int.parse(dateMatch.group(5))
-                            )
-                        )
-                );
+                course.latestPost = new Post()
+                    ..heading = latestPost.querySelector('h1.entry-title').text
+                    ..author = latestPost.querySelector('.entry-byline strong').text
+                    ..time = parseDate(latestPost.querySelector('.entry-byline').text);
             }
 
-            courses.add(course);
-        }, onDone: courses.close);
+            return course;
+        });
 
-    return courses.stream;
-}
-
-Iterable<String> _nextPages(PageInfo<Document> document) {
+/// Get the next page on course listing if exists and also all courses in the list itself
+Iterable<String> nextPages(PageInfo<Document> document) {
     if (!document.url.startsWith('$ROOT/kurser')) return [];
     var nextPages = [];
 
@@ -81,4 +70,17 @@ Iterable<String> _nextPages(PageInfo<Document> document) {
     nextPages.addAll(courseLinks);
 
     return nextPages;
+}
+
+/// Returns the first found [DateTime] in [text]
+DateTime parseDate(String text) {
+    var dateMatch = DATE_PATTERN.firstMatch(text);
+
+    return new DateTime.utc(
+        int.parse(dateMatch.group(1)),
+        int.parse(dateMatch.group(2)),
+        int.parse(dateMatch.group(3)),
+        int.parse(dateMatch.group(4)),
+        int.parse(dateMatch.group(5))
+    );
 }
