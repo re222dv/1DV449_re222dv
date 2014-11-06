@@ -35,7 +35,8 @@ Future<bool> isOld(String filename) =>
         .then((json) => json['timestamp'])
         .then(DateTime.parse)
         .then((timestamp) => timestamp.add(new Duration(minutes: 5)))
-        .then((timestamp) => timestamp.isBefore(new DateTime.now()));
+        .then((timestamp) => timestamp.isBefore(new DateTime.now()))
+        .catchError((_) => true);
 
 Map asJson(Course course) => {
     'name': course.name,
