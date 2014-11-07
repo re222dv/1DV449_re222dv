@@ -1,15 +1,40 @@
 part of coursepress_scarper;
 
-const ROOT = 'http://coursepress.lnu.se';
+const ROOT = 'https://coursepress.lnu.se';
+const COURSE = '$ROOT/kurs/';
+const PROJECT = '$ROOT/projekt/';
+const PROGRAM = '$ROOT/program/';
+const SUBJECT = '$ROOT/subject/';
 
 final DATE_PATTERN = new RegExp(r'(\d{4})\-(\d\d)\-(\d\d) (\d\d)\:(\d\d)');
 final SYLLABUS_PATTERN = new RegExp(r'(kursinfo\.lnu\.se/(utbildning/)?GenerateDocument\.ashx)|kursplan.lnu.se');
 
 /// Scrapes CoursePress on Linnéaus University and returns a [Stream] of [Course]s
-Stream<Course> scrape() =>
-    crawl('$ROOT/kurser', nextPages, 're222dv')
-        .where((page) => page.url.startsWith('$ROOT/kurs/'))
-        .map(parseCourse);
+Stream<NamedPage> scrape() {
+    var namedPages = new StreamController.broadcast();
+
+    var documents = crawl('$ROOT/kurser', nextPages, 're222dv')
+            ..where((page) => page.url.startsWith(COURSE))
+             .map(parseCourse)
+             .listen(namedPages.add)
+
+            ..where((page) => page.url.startsWith(PROJECT))
+             .map(parseProject)
+             .listen(namedPages.add)
+
+            ..where((page) => page.url.startsWith(PROGRAM))
+             .map(parseProgram)
+             .listen(namedPages.add)
+
+            ..where((page) => page.url.startsWith(SUBJECT))
+             .map(parseSubject)
+             .listen(namedPages.add)
+
+            ..last
+             .then((_) => namedPages.close());
+
+    return namedPages.stream;
+}
 
 /// Get the next page on course listing if exists and also all courses in the list itself
 Iterable<String> nextPages(PageInfo<Document> document) {
@@ -19,11 +44,16 @@ Iterable<String> nextPages(PageInfo<Document> document) {
     var nextLink = document.data.querySelector('a.next.page-numbers');
     if (nextLink != null) nextPages.add(ROOT + nextLink.attributes['href']);
 
-    var courseLinks = document.data.querySelectorAll('.item-title a')
-        .map((a) => a.attributes['href'])
-        .where((link) => link.startsWith('$ROOT/kurs'));
-
-    nextPages.addAll(courseLinks);
+    nextPages.addAll(
+        document.data.querySelectorAll('.item-title a')
+            .map((a) => a.attributes['href'])
+            .where((link) =>
+                link.startsWith(COURSE) ||
+                link.startsWith(PROJECT) ||
+                link.startsWith(PROGRAM) ||
+                link.startsWith(SUBJECT)
+            )
+    );
 
     return nextPages;
 }
@@ -42,6 +72,28 @@ Course parseCourse(PageInfo<Document> coursePage) =>
                 orElse: () => null
             ),
         latestPost: parseLatestPost(coursePage.data)
+    );
+
+Project parseProject(PageInfo<Document> projectPage) =>
+    new Project(
+        name: projectPage.data.querySelector('h1').text.trim(),
+        url: projectPage.url,
+        latestPost: parseLatestPost(projectPage.data)
+    );
+
+Program parseProgram(PageInfo<Document> programPage) =>
+    new Program(
+        name: programPage.data.querySelector('h1').text.trim(),
+        url: programPage.url,
+        description: programPage.data.querySelector('.entry-content>p').text,
+        latestPost: parseLatestPost(programPage.data)
+    );
+
+Subject parseSubject(PageInfo<Document> projectPage) =>
+    new Subject(
+        name: projectPage.data.querySelector('h1').text.trim(),
+        url: projectPage.url,
+        latestPost: parseLatestPost(projectPage.data)
     );
 
 /// Parses the latest post on a course page

@@ -6,22 +6,34 @@ Future<String> readFromFile(String filename) =>
         .readAsString();
 
 /// Collects the stream of courses, caches and returns them
-Future<String> cacheToFile(String filename, Stream<Course> courses) =>
-    courses
-        .map(toJson)
-        .map(noInformation)
-        .toList()
-        .then((list) {
-            list.sort((a, b) => a['name'].compareTo(b['name']));
-            return list;
-        })
-        .then(createWrapper)
-        .then(JSON.encode)
-        .then((json) =>
-            new File(filename)
-                .writeAsString(json, flush: true)
-                .then((_) => json)
-        );
+Future<String> cacheToFile(String filename, Stream<NamedPage> namedPages) =>
+    Future.wait([
+        namedPages.where((page) => page is Course).toList(),
+        namedPages.where((page) => page is Project).toList(),
+        namedPages.where((page) => page is Program).toList(),
+        namedPages.where((page) => page is Subject).toList(),
+    ])
+    .then((pageTypes) =>
+        pageTypes
+            .map((pages) =>
+                pages
+                    .map(toJson)
+                    .map(noInformation)
+                    .toList()
+            )
+            .map((pages) {
+                pages.sort((a, b) => a['name'].compareTo(b['name']));
+                return pages;
+            })
+            .toList()
+    )
+    .then(createWrapper)
+    .then(JSON.encode)
+    .then((json) =>
+        new File(filename)
+            .writeAsString(json, flush: true)
+            .then((_) => json)
+    );
 
 /// Checks if the cached course data is old
 Future<bool> isCacheOld(String filename) =>
@@ -33,20 +45,6 @@ Future<bool> isCacheOld(String filename) =>
         .then((timestamp) => timestamp.isBefore(new DateTime.now()))
         .catchError((_) => true);
 
-/// Creates an json encodable format of a [Course]
-Map toJson(Course course) => {
-    'name': course.name,
-    'code': course.code,
-    'url': course.url,
-    'syllabusUrl': course.syllabusUrl,
-    'description': course.description,
-    'latestPost': course.latestPost == null ? null : {
-        'heading': course.latestPost.heading,
-        'author': course.latestPost.author,
-        'time': course.latestPost.time.toIso8601String()
-    },
-};
-
 /// Changes null values to a no information label
 Map noInformation(Map input) => input..keys.forEach((key) {
     var value = input[key];
@@ -56,8 +54,14 @@ Map noInformation(Map input) => input..keys.forEach((key) {
 });
 
 /// Wraps the courses in a body with a date and a count
-Map createWrapper(List courses) => {
-    'courses': courses,
-    'coursesCount': courses.length,
+Map createWrapper(List<List> pageTypes) => {
+    'courses': pageTypes[0],
+    'projects': pageTypes[1],
+    'program': pageTypes[2],
+    'subject': pageTypes[3],
+    'coursesCount': pageTypes[0].length,
+    'projectsCount': pageTypes[1].length,
+    'programCount': pageTypes[2].length,
+    'subjectCount': pageTypes[3].length,
     'timestamp': new DateTime.now().toIso8601String(),
 };

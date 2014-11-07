@@ -8,4 +8,5 @@ import 'src/crawler/crawler.dart';
 
 part 'src/entities.dart';
 part 'src/file_storage.dart';
+part 'src/json_formatter.dart';
 part 'src/scraper.dart';
