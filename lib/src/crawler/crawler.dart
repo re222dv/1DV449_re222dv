@@ -31,7 +31,7 @@ Stream<PageInfo<Document>> crawl(String url, NextPages nextPages, [String userAg
     var linksToGet = new StreamController<String>();
     var documents = linksToGet.stream
         .asyncMap(getPage(userAgent))
-        .map(httpParser(linksToGet))
+        .map(httpParser(linksToGet.add))
         .where(notNull)
         .map(htmlParser)
         .asBroadcastStream();
@@ -54,9 +54,9 @@ PageGetter getPage([String userAgent]) => (url) =>
         .then((response) => new PageInfo(url, response));
 
 /// Returns a [HttpParser] that adds redirects to [linksToGet]
-HttpParser httpParser(StreamController linksToGet) => (PageInfo<http.Response> response) {
+HttpParser httpParser(addLinkToGet(String link)) => (PageInfo<http.Response> response) {
     if (response.data.isRedirect) {
-        linksToGet.add(response.data.headers['Location']);
+        addLinkToGet(response.data.headers['Location']);
         return null;
     }
     if (response.data.statusCode != 200) throw 'Got status code ${response.data.statusCode}';
