@@ -6,12 +6,12 @@ Future<String> readFromFile(String filename) =>
         .readAsString();
 
 /// Collects the stream of courses, caches and returns them
-Future<String> cacheToFile(String filename, Stream<NamedPage> namedPages) =>
+Future<String> cacheToFile(String filename, Stream<Page> namedPages) =>
     Future.wait([
         namedPages.where((page) => page is Course).toList(),
-        namedPages.where((page) => page is Project).toList(),
+        namedPages.where((page) => page.type == 'project').toList(),
         namedPages.where((page) => page is Program).toList(),
-        namedPages.where((page) => page is Subject).toList(),
+        namedPages.where((page) => page.type == 'subject').toList(),
     ])
     .then((pageTypes) =>
         pageTypes

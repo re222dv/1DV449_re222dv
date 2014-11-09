@@ -1,17 +1,9 @@
 part of coursepress_scarper;
 
-abstract class NamedPage {
-    final String name;
-    final String url;
-
-    NamedPage(this.name, this.url);
-}
-
-class Course extends NamedPage {
+class Course extends Page {
     final String code;
     final String syllabusUrl;
     final String description;
-    final Post latestPost;
 
     Course({
         name,
@@ -19,8 +11,27 @@ class Course extends NamedPage {
         url,
         this.syllabusUrl,
         this.description,
+        latestPost
+    }) : super(
+        type: 'course',
+        name: name,
+        url: url,
+        latestPost: latestPost
+    );
+}
+
+class Page {
+    final String type;
+    final String name;
+    final String url;
+    final Post latestPost;
+
+    Page({
+        this.type,
+        this.name,
+        this.url,
         this.latestPost
-    }) : super(name, url);
+    });
 }
 
 class Post {
@@ -35,34 +46,18 @@ class Post {
     });
 }
 
-class Project extends NamedPage {
-    final Post latestPost;
-
-    Project({
-        name,
-        url,
-        this.latestPost
-    }) : super(name, url);
-}
-
-class Program extends NamedPage {
+class Program extends Page {
     final String description;
-    final Post latestPost;
 
     Program({
         name,
         url,
         this.description,
-        this.latestPost
-    }) : super(name, url);
-}
-
-class Subject extends NamedPage {
-    final Post latestPost;
-
-    Subject({
-        name,
-        url,
-        this.latestPost
-    }) : super(name, url);
+        latestPost
+    }) : super(
+        type: 'program',
+        name: name,
+        url: url,
+        latestPost: latestPost
+    );
 }

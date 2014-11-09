@@ -10,7 +10,7 @@ final DATE_PATTERN = new RegExp(r'(\d{4})\-(\d\d)\-(\d\d) (\d\d)\:(\d\d)');
 final SYLLABUS_PATTERN = new RegExp(r'(kursinfo\.lnu\.se/(utbildning/)?GenerateDocument\.ashx)|kursplan.lnu.se');
 
 /// Scrapes CoursePress on Linnéaus University and returns a [Stream] of [Course]s
-Stream<NamedPage> scrape() {
+Stream<Page> scrape() {
     var namedPages = new StreamController.broadcast();
 
     var documents = crawl('$ROOT/kurser', nextPages, 're222dv')
@@ -19,7 +19,7 @@ Stream<NamedPage> scrape() {
              .listen(namedPages.add)
 
             ..where((page) => page.url.startsWith(PROJECT))
-             .map(parseProject)
+             .map(parsePage('project'))
              .listen(namedPages.add)
 
             ..where((page) => page.url.startsWith(PROGRAM))
@@ -27,11 +27,11 @@ Stream<NamedPage> scrape() {
              .listen(namedPages.add)
 
             ..where((page) => page.url.startsWith(SUBJECT))
-             .map(parseSubject)
+             .map(parsePage('subject'))
              .listen(namedPages.add)
 
             ..last
-             .then((_) => namedPages.close());
+             .whenComplete(namedPages.close);
 
     return namedPages.stream;
 }
@@ -74,26 +74,22 @@ Course parseCourse(PageInfo<Document> coursePage) =>
         latestPost: parseLatestPost(coursePage.data)
     );
 
-Project parseProject(PageInfo<Document> projectPage) =>
-    new Project(
-        name: projectPage.data.querySelector('h1').text.trim(),
-        url: projectPage.url,
-        latestPost: parseLatestPost(projectPage.data)
+/// Parses a generic page
+parsePage(String type) => (PageInfo<Document> page) =>
+    new Page(
+        type: type,
+        name: page.data.querySelector('h1').text.trim(),
+        url: page.url,
+        latestPost: parseLatestPost(page.data)
     );
 
+/// Parses a program page
 Program parseProgram(PageInfo<Document> programPage) =>
     new Program(
         name: programPage.data.querySelector('h1').text.trim(),
         url: programPage.url,
         description: programPage.data.querySelector('.entry-content>p').text,
         latestPost: parseLatestPost(programPage.data)
-    );
-
-Subject parseSubject(PageInfo<Document> projectPage) =>
-    new Subject(
-        name: projectPage.data.querySelector('h1').text.trim(),
-        url: projectPage.url,
-        latestPost: parseLatestPost(projectPage.data)
     );
 
 /// Parses the latest post on a course page
