@@ -6,6 +6,8 @@ import 'package:html5lib/parser.dart' as html show parse;
 import 'package:html5lib/dom.dart';
 import 'stream_functions.dart';
 
+final _pagesToVisit = [];
+
 /// A function that returns an [Iterable] with links that should be visited next
 typedef Iterable<String> NextPages(PageInfo<Document> document);
 /// A function that downloads a page
@@ -25,7 +27,7 @@ class PageInfo<T> {
  * Returns a [Stream] of [PageInfo] with the url and DOM object for each page visited
  */
 Stream<PageInfo<Document>> crawl(String url, NextPages nextPages, [String userAgent]) {
-    var linksToGet = new StreamController<String>.broadcast();
+    var linksToGet = new StreamController<String>();
     var documents = linksToGet.stream
         .asyncMap(getPage(userAgent))
         .map(httpParser(linksToGet))
@@ -34,14 +36,10 @@ Stream<PageInfo<Document>> crawl(String url, NextPages nextPages, [String userAg
         .asBroadcastStream();
 
     documents
-        .map(nextPages)
+        .map(_get(nextPages, linksToGet))
         .map((nextPages) => new Stream.fromIterable(nextPages))
         .transform(flatten)
         .listen(linksToGet.add);
-
-    linksToGet.stream
-        .timeout(new Duration(seconds: 10), onTimeout: (_) => linksToGet.close())
-        .drain();
 
     linksToGet.add(url);
 
@@ -66,3 +64,15 @@ HttpParser httpParser(StreamController linksToGet) => (PageInfo<http.Response> r
 
 /// Parses html and returns a DOM object
 PageInfo<Document> htmlParser(PageInfo<String> page) => new PageInfo(page.url, html.parse(page.data));
+
+/// Keeps track of all pages that we should visit so that we know when we are done
+NextPages _get(NextPages nextPages, StreamController linksToGet) => (PageInfo<Document> document) {
+    Iterable links = nextPages(document);
+
+    _pagesToVisit.remove(document.url);
+    _pagesToVisit.addAll(links);
+
+    if (_pagesToVisit.isEmpty) linksToGet.close();
+
+    return links;
+};
