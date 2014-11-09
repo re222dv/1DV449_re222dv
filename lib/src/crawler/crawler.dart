@@ -6,6 +6,7 @@ import 'package:html5lib/parser.dart' as html show parse;
 import 'package:html5lib/dom.dart';
 import 'stream_functions.dart';
 
+const STOP_CRAWLING = 'stop crawling';
 final _pagesToVisit = [];
 
 /// A function that returns an [Iterable] with links that should be visited next
@@ -36,7 +37,8 @@ Stream<PageInfo<Document>> crawl(String url, NextPages nextPages, [String userAg
         .asBroadcastStream();
 
     documents
-        .map(_get(nextPages, linksToGet))
+        .map(_get(nextPages))
+        .handleError((_) => linksToGet.close(), test: (error) => error == STOP_CRAWLING)
         .map((nextPages) => new Stream.fromIterable(nextPages))
         .transform(flatten)
         .listen(linksToGet.add);
@@ -66,13 +68,13 @@ HttpParser httpParser(StreamController linksToGet) => (PageInfo<http.Response> r
 PageInfo<Document> htmlParser(PageInfo<String> page) => new PageInfo(page.url, html.parse(page.data));
 
 /// Keeps track of all pages that we should visit so that we know when we are done
-NextPages _get(NextPages nextPages, StreamController linksToGet) => (PageInfo<Document> document) {
+NextPages _get(NextPages nextPages) => (PageInfo<Document> document) {
     Iterable links = nextPages(document);
 
     _pagesToVisit.remove(document.url);
     _pagesToVisit.addAll(links);
 
-    if (_pagesToVisit.isEmpty) linksToGet.close();
+    if (_pagesToVisit.isEmpty) throw STOP_CRAWLING;
 
     return links;
 };
