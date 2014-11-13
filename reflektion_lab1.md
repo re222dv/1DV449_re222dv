@@ -24,8 +24,8 @@ En annan risk är att vi hämtar data som vi inte har rätt till genom exempelvi
 hända att siteägaren blir arg och stänger oss ute helt.
 
 # Tänk dig att du skulle skrapa en sida gjord i ASP.NET WebForms. Vad för extra problem skulle man kunna få då?
-Ostrukturerad HTML vilket gör att det blir svårare att hämta korrekt data. Komponenter kan
-rendera olika HTML vid olika tillfällen vilker gör det väldigt svårt att hitta rätt i alla fall.
+Den senaste viewstaten måste skickas med i varje request. Komponenter kan rendera olika HTML
+vid olika tillfällen vilker gör det väldigt svårt att hitta rätt i alla fall.
 
 # Välj ut två punkter kring din kod du tycker är värd att diskutera vid redovisningen. Det kan röra val du gjort, tekniska lösningar eller lösningar du inte är riktigt nöjd med.
 Jag har valt att programmera med mönstret FRP (Functional Reactive Programming) då jag länge velat
