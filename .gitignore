@@ -1,2 +1,24 @@
+../.idea
+Laboration 1/bin/packages
+
+
+node_modules
+bower_components
+.tmp
+dump.rdb
+lib-cov
+*.seed
+*.log
+*.out
+*.pid
+npm-debug.log
+
+*~
+*#
+.DS_STORE
+.netbeans
+nbproject
 .idea
-packages
+.node_history
+
+config/local.js
