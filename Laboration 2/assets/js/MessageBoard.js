@@ -1,94 +1,82 @@
-var MessageBoard = {
+(function() {
 
-    messages: [],
-    textField: null,
-    messageArea: null,
+    var messages = [];
+    var nameField;
+    var textField;
+    var messageArea;
+    var nrOfMessages;
 
-    init: function () {
+    var init = function () {
+        nameField = document.getElementById("inputName");
+        textField = document.getElementById("inputText");
+        messageArea = document.getElementById("messagearea");
+        nrOfMessages = document.getElementById("nrOfMessages");
 
-        MessageBoard.textField = document.getElementById("inputText");
-        MessageBoard.nameField = document.getElementById("inputName");
-        MessageBoard.messageArea = document.getElementById("messagearea");
-
-        // Add eventhandlers
-        document.getElementById("inputText").onfocus = function() {
+        textField.onfocus = function() {
             this.className = "focus";
         };
-        document.getElementById("inputText").onblur = function() {
+        textField.onblur = function() {
             this.className = "blur"
         };
         document.getElementById("buttonSend").onclick = function() {
-            MessageBoard.sendMessage();
+            sendMessage();
             return false;
         };
 
-        MessageBoard.textField.onkeypress = function (e) {
+        textField.onkeypress = function (e) {
             if (e.keyCode == 13 && !e.shiftKey) {
-                MessageBoard.sendMessage();
+                sendMessage();
 
                 return false;
             }
-        }
+        };
 
-    },
-    getMessages: function () {
-        $.ajax({
-                type: "GET",
-                url: "/message",
-        })
-        .done(function (messages) {
+        getMessages();
+    };
+
+    var getMessages = function () {
+        $.get("/message").done(function (messages) {
             messages
                 .map(Message.create)
                 .forEach(function(message) {
-                    MessageBoard.messages.push(message);
-                    MessageBoard.renderMessage(message);
+                    messages.push(message);
+                    renderMessage(message);
                 });
-            document.getElementById("nrOfMessages").textContent = MessageBoard.messages.length;
+            nrOfMessages.textContent = messages.length;
         });
+    };
 
-
-    },
-    sendMessage: function () {
-
-        if (MessageBoard.textField.value == "") {
+    var sendMessage = function () {
+        if (textField.value == "") {
             return;
         }
 
-        // Make call to ajax
-        $.ajax(
-            {
-                type: "GET",
-                url: "/csrfToken",
-            }
-        )
-        .done(function(data) {
-            $.ajax({
-                type: "POST",
-                url: "/message",
-                data: {
-                    _csrf: data._csrf,
-                    alias: MessageBoard.nameField.value,
-                    text: MessageBoard.textField.value,
-                }
+        $.get("/csrfToken").done(function(data) {
+            $.post("/message", {
+                _csrf: data._csrf,
+                alias: nameField.value,
+                text: textField.value,
             })
             .done(function() {
                 alert("Your message is saved! Reload the page for watching it");
             });
         });
 
-    },
-    renderMessages: function () {
+    };
+
+    var renderMessages = function () {
         // Remove all messages
-        MessageBoard.messageArea.innerHTML = "";
+        messageArea.innerHTML = "";
 
         // Renders all messages.
-        MessageBoard.messages.forEach(function(message) {
-            MessageBoard.renderMessage(message);
+        messages.forEach(function(message) {
+            renderMessage(message);
         });
 
-        document.getElementById("nrOfMessages").textContent = MessageBoard.messages.length;
-    },
-    renderMessage: function (message) {
+        nrOfMessages.textContent = messages.length;
+    };
+
+    var renderMessage = function (message) {
         // Message div
         var div = document.createElement("div");
         div.className = "message";
@@ -97,7 +85,7 @@ var MessageBoard = {
         var aTag = document.createElement("a");
         aTag.href = "#";
         aTag.onclick = function () {
-            MessageBoard.showTime(message.date);
+            showTime(message.date);
             return false;
         };
 
@@ -128,19 +116,20 @@ var MessageBoard = {
 
         div.appendChild(spanClear);
 
-        MessageBoard.messageArea.appendChild(div);
-    },
-    removeMessage: function (messageID) {
+        messageArea.appendChild(div);
+    };
+
+    var removeMessage = function (messageID) {
         if (window.confirm("Vill du verkligen radera meddelandet?")) {
+            messages.splice(messageID, 1); // Removes the message from the array.
 
-            MessageBoard.messages.splice(messageID, 1); // Removes the message from the array.
-
-            MessageBoard.renderMessages();
+            renderMessages();
         }
-    },
-    showTime: function (date) {
-        alert("Created " + date.toLocaleDateString() + " at " + date.toLocaleTimeString());
-    }
-};
+    };
 
-window.onload = MessageBoard.init;
+    var showTime = function (date) {
+        alert("Created " + date.toLocaleDateString() + " at " + date.toLocaleTimeString());
+    };
+
+    window.addEventListener('load', init);
+})();
