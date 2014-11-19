@@ -6,7 +6,14 @@
  */
 
 module.exports = {
-	index: function (req, res) {
+    index: function (req, res) {
+        if (req.session.user) {
+            res.redirect('/chat');
+        }
+        res.view('login', {failed: false});
+    },
+
+	login: function (req, res) {
         var username = req.param('username');
         var password = req.param('password');
 
@@ -18,17 +25,17 @@ module.exports = {
                     var user = users[0];
                     if (PasswordService.verify(password, user.hash)) {
                         req.session.user = user;
-                        res.send('Hello ' + user.username);
+                        res.redirect('/chat');
                     } else {
-                        res.send('Username or Password is invalid');
+                        if (req.session.user) req.session.user = null;
+                        res.view('login', {failed: true});
                     }
                 } else {
-                    res.send(404, { error: 'User not Found' });
+                    if (req.session.user) req.session.user = null;
+                    res.view('login', {failed: true});
                 }
             }
         });
-
-        //res.view();
     }
 };
 

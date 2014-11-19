@@ -43,6 +43,11 @@
 </style>
 <form class="form-signin" method="POST">
     <h2 class="form-signin-heading">Log in</h2>
+    <%if (failed) { %>
+        <div class="error">
+            Username or Password is invalid
+        </div>
+    <% } %>
     <input value="" name="username" type="text" class="form-control" placeholder="Användarnamn" required autofocus>
     <input value="" name="password" type="password" class="form-control" placeholder="Password" required>
     <button class="btn btn-lg btn-primary btn-block" type="submit">Log in</button>
