@@ -1,35 +1,11 @@
-function Message(message, date){
+var Message = Message || {};
 
-	this.getText = function() {
-		return message;
-	}
+Message.create = function(message) {
+    var date = new Date(message.createdAt);
 
-	this.setText = function(_text) {
-		message = text;
-	}
-
-	this.getDate = function() {
-		return date;
-	}
-
-	this.setDate = function(_date) {
-		date = date;
-	}
-
-}
-
-Message.prototype.toString = function(){
-	return this.getText()+" ("+this.getDate()+")";
-}
-
-Message.prototype.getHTMLText = function() {
-      
-    return this.getText().replace(/[\n\r]/g, "<br />");
-}
-
-Message.prototype.getDateText = function() {
-    return this.getDate().toLocaleTimeString();
-}
-
-
-
+    return Object.freeze({
+        get alias() {return message.alias;},
+        get text() {return message.text;},
+        get date() {return date;},
+    });
+};
