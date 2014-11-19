@@ -36,6 +36,11 @@ module.exports = {
                 }
             }
         });
-    }
+    },
+
+    logout: function (req, res) {
+        req.session.user = null;
+        res.redirect('/');
+    },
 };
 

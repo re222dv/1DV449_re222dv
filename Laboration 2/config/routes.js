@@ -34,6 +34,7 @@ module.exports.routes = {
 
     'GET /': 'UserController.index',
     'POST /': 'UserController.login',
+    'POST /logout': 'UserController.logout',
 
     'GET /chat': 'ChatController.index',
 

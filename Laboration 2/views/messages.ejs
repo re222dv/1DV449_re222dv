@@ -112,7 +112,9 @@
 </style>
 
 <div id="messageboard">
-    <input class="btn btn-danger" type="button" id="buttonLogout" value="Logout" style="margin-bottom: 20px;" />
+    <form action="/logout" method="post">
+        <input class="btn btn-danger" type="submit" value="Logout" style="margin-bottom: 20px;" />
+    </form>
 
     <div id="messagearea"></div>
 
