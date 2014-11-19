@@ -36,4 +36,7 @@ module.exports.routes = {
     'POST /': 'UserController.login',
 
     'GET /chat': 'ChatController.index',
+
+    'GET /message': 'MessageController.read',
+    'POST /message': 'MessageController.create',
 };

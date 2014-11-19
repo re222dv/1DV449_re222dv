@@ -127,7 +127,9 @@
 
 <!-- This script is running to get the messages -->
 <script>
-    $(document).ready(function() {
-        MessageBoard.getMessages();
-    });
+    window.setTimeout(function() {
+        $(document).ready(function() {
+            MessageBoard.getMessages();
+        });
+    }, 1000);
 </script>
