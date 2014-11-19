@@ -113,6 +113,7 @@
 
 <div id="messageboard">
     <form action="/logout" method="post">
+        <input type="hidden" name="_csrf" value="<%= _csrf %>" />
         <input class="btn btn-danger" type="submit" value="Logout" style="margin-bottom: 20px;" />
     </form>
 

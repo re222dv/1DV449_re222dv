@@ -55,12 +55,23 @@ var MessageBoard = {
 
         // Make call to ajax
         $.ajax({
-			type: "POST",
-		  	url: "/message",
-		  	data: {alias: MessageBoard.nameField.value, text:MessageBoard.textField.value}
-		}).done(function(data) {
-		  alert("Your message is saved! Reload the page for watching it");
-		});
+            type: "GET",
+            url: "/csrfToken",
+        })
+        .done(function(data) {
+            $.ajax({
+                type: "POST",
+                url: "/message",
+                data: {
+                    _csrf: data._csrf,
+                    alias: MessageBoard.nameField.value,
+                    text: MessageBoard.textField.value,
+                }
+            })
+            .done(function() {
+              alert("Your message is saved! Reload the page for watching it");
+            });
+        });
 
     },
     renderMessages: function(){
