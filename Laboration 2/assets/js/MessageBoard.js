@@ -64,7 +64,7 @@
     };
 
     var renderMessages = function (messages) {
-        messages
+        messages && messages
             .map(Message.create)
             .forEach(function(message) {
                 numMessages++;
@@ -113,7 +113,7 @@
 
         div.appendChild(spanClear);
 
-        messageArea.appendChild(div);
+        messageArea.insertBefore(div, messageArea.firstChild);
     };
 
     var showTime = function (date) {
