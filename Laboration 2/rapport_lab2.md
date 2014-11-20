@@ -1,20 +1,86 @@
-## Hittade säkerhetshål
-1. PHP
-  2. <http://eev.ee/blog/2012/04/09/php-a-fractal-of-bad-design/#security>
-  2. <http://phpsecurity.readthedocs.org/en/latest/_articles/PHP-Security-Default-Vulnerabilities-Security-Omissions-And-Framing-Programmers.html>
-1. Session Cookie tillåts läsas av Javacript
-1. Ej parametiserade databasfrågor
-1. Lösenord i klartext i databasen
-1. Databasen ligger i en av webbservern publicerad mapp
-1. Lös typning leder till att användare alltid godkänns
-1. Ingen kontroll av att man är inloggad vid läsning eller skrivning
-1. XSS
-1. CSRF
-1. sqllite kräver skrivbehörighet till mappen databasen ligger i
-1. Meddelandet från databasexceptions skrivs i ett flertal fall ut till användaren
-1. debug.php går att komma åt av alla (och redirectas till efter att en post har lagts till), kommentaren säger att det är obra
-1. php_errors.log är åtkomlig utifrån
-1. Sessionsstöld?
+# Laboration 2
+## Säkerhetsproblem
+### PHP
+PHP följer inte principen "secure by default", som den applikationen vi fick är byggd förvärrar det
+dessutom problemet ytterligare genom flera entrypoints där man alltid måste kolla sessionen och
+CSRF. Eftersom människor glömmer saker har applikationer som inte är byggda efter "secure by default"
+mycket större risk för säkerhetshål.
+
+Sails är "secure by default" därför att
+1. CSRF skydd implementeras av ramverket så att alla request som inte går över GET kräver en CSRF token
+1. En ORM gör att man själv inte skriver databasfrågor och därför inte råkar glömma parametisering.
+1. Policies som jag har konfigurerat efter whitelising princip och kräver autorisering på alla rutter
+  förutom de till UserController
+
+Sidor som förklarar problemen med PHPs standardinställningar
+1. <http://eev.ee/blog/2012/04/09/php-a-fractal-of-bad-design/#security>
+1. <http://phpsecurity.readthedocs.org/en/latest/_articles/PHP-Security-Default-Vulnerabilities-Security-Omissions-And-Framing-Programmers.html>
+
+### Session Cookie tillåts läsas av Javacript
+Att låta Javascript på klienten läsa sessionskakan ökar dramatiskt risken för sessions-stöld vid
+lyckad XSS. Sails tillåter inte att sessionskakan läses av Javascript på klienten.
+
+### Ej parametiserade databasfrågor
+Ej parametiserade databasfrågor gör att det går att göra SQL-injections vilket i det här fallet
+leder till att man skulle kunna logga in utan användarnamn eller lösenord. Eftersom jag använder en
+ORM så har jag inte det problemet, just nu anänder jga inte heller en SQL databas.
+
+### Lösenord i klartext i databasen
+Lösenorden sparas i klartext vilket gör att någon som lyckas stjäla databasen ser alla användares
+lösenord. Detta är extra farligt då väldigt många har samma lösenord överallt. Jag har löst det
+genom att använda Bcrypt.
+
+### Databasen ligger i en av webbservern publicerad mapp
+Databasen går lätt att ladda ner genom att besöka `/db.db`. Även om man skulle begränsa detta i
+webbserverns konfiguration så glömmer männsiskor saker och kan råka publicera den i framtiden.
+Sails databasfil ligger utanför den publicerade mappen vilket gör att det inte går att hämta den
+utifrån.
+
+### Lös typning leder till att användare alltid godkänns
+Alla användarnamn och lösenord godkänns då `isUser` returnerar en sträng vid felaktigt användarnamn
+eller lösenord, tack vare en löst typad if-sats så evalueras det som sant och alla användarnamn
+och lösenord godkänns. Min `PasswordService` returnerar bara resultatet av `bcrypt.compareSync`
+vilket antingen är `true` eller `false`.
+
+### Ingen kontroll av att man är inloggad vid läsning eller skrivning
+APIet för att posta och hämta meddelandet kollar inte att användaren är inloggad. Det gör att alla
+kan skicka meddelanden även fast de inte är inloggade. Jag har löst det genom att ha `sessionAuth`
+policyn aktiv på alla rutter förutom de till `UserController`.
+
+### XSS
+P.g.a. användning av `innerHtml` så är chatten helt öppen för diverse XSS attacker. Dessa skulle t.ex.
+kunna stjäla sessionen, skapa en mask, skicka användaren till olika sidor och många liknande attacker.
+Jag har löst det genom att istället använda `textContent` där inehållet inte tolkas av webbläsaren.
+
+### CSRF
+Meddelanden postas via GET och kräver inte ett CSRF token vilket gör chatten väldigt utsatt för CSRF
+attacker som t.ex. postar meddelanden eller loggar ut användaren. Jag har löst det genom att
+postning av meddelanden samt utloggning sköts över POST och aktiverat Sails CSRF skydd som kräver
+ett CSRF token för alla request som använder ett annat verb än GET.
+
+### Sqlite kräver skrivbehörighet till mappen databasen ligger i
+Sqlite kräver skrivbehörighet till mappen som databasen ligger i istället för bara databasfilen.
+Eftersom sqlite körs av PHP gör det att PHP också måste ha skrivbehörighet till den mappen, det gör
+att ett säkerhetshål i PHP eller vår applikation kan leda till att externa användare kan skapa
+körbara PHP-filer, och köra dom. Om externa användare kan exkvera PHP-kod på servern har de full
+tillåtelse till allt som PHP har tillåtelse att göra, som att ansluta till databasen, skicka anrop
+från vår server, läsa saker i /tmp, läsa alla användares sessioner, läsa applikationskod och om vår
+server är felkonfigurerad komma åt systemfiler.
+Detta löses genom att inte använda Sqlite. Med Sails är det dessutom bar en konfigurationsak att
+använda en annan databashanterare vilket gör att det är lätt att byta till en extern och inte låta
+Node ha skrivrättigheter till något alls.
+
+### Meddelandet från databasexceptions skrivs i ett flertal fall ut till användaren
+Databasexception kan innehålla känslig information som t.ex. databasstrukturen, användare och även
+lösenord. Jag löser det genom att aldrig fånga undantag och istället låta Sails presentera en felsida
+utan information vid undantag.
+
+### debug.php går att komma åt av alla (och redirectas till efter att en post har lagts till), kommentaren säger att det är obra
+Vad den skulle ha gjort kan jag inte veta, men jag har ingen sån fil.
+
+### php_errors.log är åtkomlig utifrån
+PHP fel kan innehålla information om applikationskoden och databasuppgifter. Jag har ingen sån logg
+utan felmeddelanden skrivs till STDERR.
 
 ## Optimering
 Alla mätningar är gjorda i Firefox och avlästa i nätverksfliken i dev-tools efter en cache-fri omladdning.
@@ -42,7 +108,7 @@ minifierade jquery).
   javascriptet inte behövs, detta tar också bort bootstraps beroende på jQuery.
 1. Att göra en egen ajaxfunktion och kasta jQuery sparar ytterligare `266 kB` och för första gången
   ser vi en förbättrad laddningstid till runt `0,32 s`. Mest är det för att webbläsaren får
-  mycket mindre JavaScript att tolka och köra.
+  mycket mindre Javascript att tolka och köra.
 1. Nu är storleken alltså nere på `97 kB` med 8 request. Att köra sails i produktionsläge
   (minifiering och konkatenering av CSS och JS) tar ner det till 6 request och `89 kB`.
 1. Minifiering av HTML sparar ytterligare `3 kB`
