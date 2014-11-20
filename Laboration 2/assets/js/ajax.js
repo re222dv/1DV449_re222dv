@@ -19,7 +19,6 @@ function ajax(url, body, callback) {
     if (body != '') {
         xhr.open('POST', url, true);
         xhr.setRequestHeader('Content-type', 'application/json');
-        xhr.setRequestHeader('Connection', 'close');
     } else {
         xhr.open('GET', url, true);
     }
