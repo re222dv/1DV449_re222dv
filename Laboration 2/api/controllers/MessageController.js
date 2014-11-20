@@ -13,14 +13,26 @@ module.exports = {
         });
     },
 
+    event: function(req, res) {
+        var timeout = setTimeout(function() {
+            EventService.unsubscribe(id);
+            res.json([]);
+        }, 30000);
+        var id = EventService.subscribe(function(message) {
+            clearTimeout(timeout);
+            res.json([message]);
+        });
+    },
+
     create: function(req, res) {
         Message.create({
             alias: req.param('alias'),
             text: req.param('text'),
             user: req.session.user,
         })
-        .exec(function(err) {
+        .exec(function(err, message) {
             if (err) return res.serverError('DB Error');
+            EventService.notify(message);
             res.ok();
         });
     }

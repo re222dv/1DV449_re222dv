@@ -48,8 +48,6 @@ minifierade jquery).
 1. Minifiering av HTML sparar ytterligare `3 kB`
 1. Att flytta ut CSS till en separat fil som sen minfieras och konkateneras ger `0,1 kB` och
   tillåter caching.
-1. Borttagning av de två oanvända JavaScript-funktionerna `removeMessage` och `renderMessages`
-  ger ingen mätbar skillnad.
 
 ### Teoretiska Optimeringar
 Optimeringar som bör snabba upp applikationen ytterligare men som jag inte kommer göra p.g.a.

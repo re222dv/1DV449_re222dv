@@ -1,6 +1,6 @@
 (function() {
 
-    var messages = [];
+    var numMessages = 0;
     var nameField;
     var textField;
     var messageArea;
@@ -37,14 +37,15 @@
     };
 
     var getMessages = function () {
-        get("/message", function(messages) {
-            messages
-                .map(Message.create)
-                .forEach(function(message) {
-                    messages.push(message);
-                    renderMessage(message);
-                });
-            nrOfMessages.textContent = messages.length;
+        get("/message", renderMessages);
+
+        pollMessages();
+    };
+
+    var pollMessages = function () {
+        get("/messageEvent", function(messages) {
+            renderMessages(messages);
+            window.setTimeout(pollMessages, 0);
         });
     };
 
@@ -60,15 +61,16 @@
                 text: textField.value,
             });
         });
+    };
 
-        renderMessage(
-            Message.create({
-                               alias: nameField.value,
-                               text: textField.value,
-                           })
-        );
-        nrOfMessages.textContent = messages.length;
-
+    var renderMessages = function (messages) {
+        messages
+            .map(Message.create)
+            .forEach(function(message) {
+                numMessages++;
+                renderMessage(message);
+            });
+        nrOfMessages.textContent = numMessages;
     };
 
     var renderMessage = function (message) {

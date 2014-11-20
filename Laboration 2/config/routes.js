@@ -39,5 +39,6 @@ module.exports.routes = {
     'GET /chat': 'ChatController.index',
 
     'GET /message': 'MessageController.read',
+    'GET /messageEvent': 'MessageController.event',
     'POST /message': 'MessageController.create',
 };
