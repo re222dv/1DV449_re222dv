@@ -56,9 +56,15 @@
                 _csrf: data._csrf,
                 alias: nameField.value,
                 text: textField.value,
-            }, function() {
-                alert("Your message is saved! Reload the page for watching it");
             });
+
+            renderMessage(
+                Message.create({
+                    alias: nameField.value,
+                    text: textField.value,
+                })
+            );
+            nrOfMessages.textContent = messages.length;
         });
 
     };
