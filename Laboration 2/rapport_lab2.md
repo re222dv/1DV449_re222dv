@@ -71,3 +71,11 @@ Om man inte slår ihop bilderna skulle en förbättring vara att förladda `cloc
 kunna klippa `60 ms` då den kan laddas parallellt.
 
 Om chattenhistoriken skulle bli lång kan paginering minska storleken samt förbättra avändarupplevelsen.
+
+## Longpolling
+Jag har implementerat longpolling genom att skapa en EventService för att skicka event mellan
+requesten. Den håller ett objekt med alla subscribers som loopas över när ett nytt event ska skickas.
+Alla subscribers får ett slumpmässigt id som används för att unsubscribe:a och göra minnet
+tillgängligt för GCn att rensa upp. Eftersom Node är enkeltrådat och non-blocking är denna modell
+väldigt enkel. Den har dock en nackdel i att den inte skalar horisontellt, om man har två instanser
+av Node så kommer bara de som lyssnar på samma instans att få event.
