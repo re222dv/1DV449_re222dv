@@ -35,7 +35,7 @@
     };
 
     var getMessages = function () {
-        $.get("/message").done(function (messages) {
+        get("/message", function(messages) {
             messages
                 .map(Message.create)
                 .forEach(function(message) {
@@ -51,29 +51,16 @@
             return;
         }
 
-        $.get("/csrfToken").done(function(data) {
-            $.post("/message", {
+        get("/csrfToken", function(data) {
+            post("/message", {
                 _csrf: data._csrf,
                 alias: nameField.value,
                 text: textField.value,
-            })
-            .done(function() {
+            }, function() {
                 alert("Your message is saved! Reload the page for watching it");
             });
         });
 
-    };
-
-    var renderMessages = function () {
-        // Remove all messages
-        messageArea.innerHTML = "";
-
-        // Renders all messages.
-        messages.forEach(function(message) {
-            renderMessage(message);
-        });
-
-        nrOfMessages.textContent = messages.length;
     };
 
     var renderMessage = function (message) {
@@ -117,14 +104,6 @@
         div.appendChild(spanClear);
 
         messageArea.appendChild(div);
-    };
-
-    var removeMessage = function (messageID) {
-        if (window.confirm("Vill du verkligen radera meddelandet?")) {
-            messages.splice(messageID, 1); // Removes the message from the array.
-
-            renderMessages();
-        }
     };
 
     var showTime = function (date) {
