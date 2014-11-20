@@ -20,6 +20,7 @@ module.exports = {
         }, 30000);
         var id = EventService.subscribe(function(message) {
             clearTimeout(timeout);
+            EventService.unsubscribe(id);
             res.json([message]);
         });
     },
