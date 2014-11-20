@@ -22,26 +22,9 @@ var cssFilesToInject = [
 // Client-side javascript files to inject in order
 // (uses Grunt-style wildcard/glob/splat expressions)
 var jsFilesToInject = [
-    // Dependencies like jQuery, or Angular are brought in here
-    'js/dependencies/**/*.js',
-
     // All of the rest of your client-side js files
     // will be injected here in no particular order.
     'js/**/*.js'
-];
-
-
-// Client-side HTML templates are injected using the sources below
-// The ordering of these templates shouldn't matter.
-// (uses Grunt-style wildcard/glob/splat expressions)
-//
-// By default, Sails uses JST templates and precompiles them into
-// functions for you.  If you want to use jade, handlebars, dust, etc.,
-// with the linker, no problem-- you'll just want to make sure the precompiled
-// templates get spit out to the same file.  Be sure and check out `tasks/README.md`
-// for information on customizing and installing new tasks.
-var templateFilesToInject = [
-    'templates/**/*.html'
 ];
 
 
@@ -58,8 +41,4 @@ module.exports.jsFilesToInject = jsFilesToInject.map(
         return '.tmp/public/' + path;
     }
 );
-module.exports.templateFilesToInject = templateFilesToInject.map(
-    function (path) {
-        return 'assets/' + path;
-    }
-);
+module.exports.templateFilesToInject = [];
