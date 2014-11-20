@@ -6,9 +6,13 @@ function ajax(url, body, callback) {
     var xhr = new XMLHttpRequest();
 
     xhr.onreadystatechange = function() {
-        if (xhr.readyState == 4) {
-            var response = JSON.parse(xhr.responseText);
-            callback(response);
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            try {
+                var response = JSON.parse(xhr.responseText);
+                callback && callback(response);
+            } catch(e) {
+                callback && callback();
+            }
         }
     };
 

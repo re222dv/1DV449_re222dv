@@ -8,7 +8,7 @@
 module.exports = {
 	read: function(req, res) {
         Message.find().exec(function(err, messages) {
-            if (err) return res.send(500, 'DB Error');
+            if (err) return res.serverError('DB Error');
             return res.json(messages);
         });
     },
@@ -20,7 +20,7 @@ module.exports = {
             user: req.session.user,
         })
         .exec(function(err) {
-            if (err) return res.send(500, 'DB Error');
+            if (err) return res.serverError('DB Error');
             res.ok();
         });
     }

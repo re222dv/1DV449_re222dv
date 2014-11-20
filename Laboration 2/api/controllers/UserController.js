@@ -19,7 +19,7 @@ module.exports = {
 
         User.findByUsername(username).exec(function(err, users) {
             if (err) {
-                res.send(500, { error: 'DB Error' });
+                res.serverError('DB Error');
             } else {
                 if (users.length) {
                     var user = users[0];

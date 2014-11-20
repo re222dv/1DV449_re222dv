@@ -12,26 +12,28 @@
         messageArea = document.getElementById("messagearea");
         nrOfMessages = document.getElementById("nrOfMessages");
 
-        textField.onfocus = function() {
-            this.className = "focus";
-        };
-        textField.onblur = function() {
-            this.className = "blur"
-        };
-        document.getElementById("buttonSend").onclick = function() {
-            sendMessage();
-            return false;
-        };
-
-        textField.onkeypress = function (e) {
-            if (e.keyCode == 13 && !e.shiftKey) {
+        if (textField) {
+            textField.onfocus = function() {
+                this.className = "focus";
+            };
+            textField.onblur = function() {
+                this.className = "blur"
+            };
+            document.getElementById("buttonSend").onclick = function() {
                 sendMessage();
-
                 return false;
-            }
-        };
+            };
 
-        getMessages();
+            textField.onkeypress = function (e) {
+                if (e.keyCode == 13 && !e.shiftKey) {
+                    sendMessage();
+
+                    return false;
+                }
+            };
+
+            getMessages();
+        }
     };
 
     var getMessages = function () {
@@ -57,15 +59,15 @@
                 alias: nameField.value,
                 text: textField.value,
             });
-
-            renderMessage(
-                Message.create({
-                    alias: nameField.value,
-                    text: textField.value,
-                })
-            );
-            nrOfMessages.textContent = messages.length;
         });
+
+        renderMessage(
+            Message.create({
+                               alias: nameField.value,
+                               text: textField.value,
+                           })
+        );
+        nrOfMessages.textContent = messages.length;
 
     };
 
