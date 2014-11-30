@@ -1,0 +1,89 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/core-scaffold/core-scaffold.html">
+<link rel="import" href="../../bower_components/core-icons/hardware-icons.html">
+<link rel="import" href="../../bower_components/core-menu/core-menu.html">
+<link rel="import" href="../../bower_components/core-menu/core-submenu.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-ripple/paper-ripple.html">
+<link rel="import" href="../elements.html">
+
+<polymer-element name="laboration-three" attributes="">
+  <template>
+    <style>
+      core-scaffold /deep/ core-toolbar {
+        display: none;
+      }
+    </style>
+    <link rel="stylesheet" href="laboration-three.css">
+    <sr-traffic response="{{response}}"></sr-traffic>
+    <core-scaffold>
+      <nav>
+        <paper-item id="filters" on-click="{{menuClick}}"><span flex>Visa: {{filter.name}}</span><core-icon icon="hardware:keyboard-arrow-right"></core-icon></paper-item>
+        <core-collapse>
+          <core-selection id="filterSelection" on-core-select="{{selectFilter}}"></core-selection>
+          <template repeat="{{category in categories}}">
+            <paper-item class="filter" on-click="{{setFilter}}" data-value="{{category.value}}">{{category.name}}</paper-item>
+          </template>
+        </core-collapse>
+        <paper-item on-click="{{menuClick}}"><span flex>Områden</span><core-icon icon="hardware:keyboard-arrow-right"></core-icon></paper-item>
+        <core-collapse>
+          <template repeat="{{message in response.messages}}">
+            <paper-item>{{message.title}}</paper-item>
+          </template>
+        </core-collapse>
+        <paper-item on-click="{{menuClick}}"><span flex>Meddelanden</span><core-icon icon="hardware:keyboard-arrow-right"></core-icon></paper-item>
+        <core-collapse>
+          <template repeat="{{message in response.messages}}">
+            <paper-item>{{message.title}}</paper-item>
+          </template>
+        </core-collapse>
+      </nav>
+      <traffic-map fit messages="{{response.messages | filterMessages(filter)}}"></traffic-map>
+    </core-scaffold>
+  </template>
+  <script>
+    (function () {
+
+      Polymer({
+        get categories() {
+          return [
+            {value: -1, name: 'Alla'},
+            {value: 0, name: 'Vägtrafik'},
+            {value: 1, name: 'Kollektivtrafik'},
+            {value: 2, name: 'Planerad störning'},
+            {value: 3, name: 'Övrigt'}
+          ];
+        },
+        menuClick: function (event) {
+          event.currentTarget.classList.toggle('active');
+          event.currentTarget.nextElementSibling.toggle();
+        },
+        setFilter: function(event) {
+          this.$.filterSelection.select(event.target);
+          this.$.filters.classList.remove('active');
+          this.$.filters.nextElementSibling.opened = false;
+          event.stopPropagation();
+        },
+        selectFilter: function(event, detail) {
+          detail.item.classList.toggle('selected', detail.isSelected);
+          if (detail.isSelected) {
+            this.filter = this.categories.filter(function (category) {
+              return category.value == detail.item.getAttribute('data-value');
+            })[0];
+          }
+        },
+        filterMessages: function (messages, filter) {
+          if (!messages) return messages;
+          return messages.filter(function (message) {
+            if (!filter) return true;
+            return +filter.value < 0 || filter.value == message.category;
+          })
+        },
+        domReady: function () {
+          this.$.filterSelection.select(this.shadowRoot.querySelector('paper-item.filter'));
+        }
+      });
+
+    })();
+  </script>
+</polymer-element>

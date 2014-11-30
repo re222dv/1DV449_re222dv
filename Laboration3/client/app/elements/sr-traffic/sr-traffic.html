@@ -1,0 +1,26 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/core-ajax/core-ajax.html">
+
+<polymer-element name="sr-traffic" attributes="response">
+  <template>
+    <style>
+      :host {
+        display: none;
+      }
+    </style>
+    <core-ajax url="http://127.0.0.1:9099/traffic" response="{{response}}" handleAs="json" auto on-core-response="{{resp}}"></core-ajax>
+  </template>
+  <script>
+    (function () {
+      'use strict';
+
+      Polymer({
+        get messages() {return (this.response || {}).messages},
+        resp: function (e) {
+          console.log(e.detail.response);
+        }
+      });
+
+    })();
+  </script>
+</polymer-element>

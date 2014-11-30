@@ -1,0 +1,49 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/google-map/google-map.html">
+<link rel="import" href="../elements.html">
+
+<polymer-element name="traffic-map" attributes="messages">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <google-map fit fitToMarkers on-mousedown="{{closeWindows}}" id="map">
+      <template repeat="{{message in messages}}">
+        <google-map-marker latitude="{{message.latitude}}" longitude="{{message.longitude}}">
+          <h3>{{message.title}}</h3>
+          <div layout horizontal center>
+            <span>{{message.category | category}}</span>
+            |
+            <span>{{message.subcategory}}</span>
+            |
+            <time>{{message.createddate | humanTime}}</time>
+          </div>
+          <p>{{message.description}}</p>
+        </google-map-marker>
+      </template>
+    </google-map>
+  </template>
+  <script>
+    (function () {
+      'use strict';
+
+      Polymer({
+        category: function (value) {
+          return ['Vägtrafik', 'Kollektivtrafik', 'Planerad störning', 'Övrigt'][value];
+        },
+        humanTime: function (value) {
+          var date = new Date(+value.slice(6, -7));
+          return date.toLocaleString();
+        },
+        closeWindows: function () {
+          [].slice.apply(this.$.map.querySelectorAll('google-map-marker')).forEach(function(marker) {
+            marker.info.close();
+          });
+        }
+      });
+
+    })();
+  </script>
+</polymer-element>

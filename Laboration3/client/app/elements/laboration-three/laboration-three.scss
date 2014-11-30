@@ -1,0 +1,25 @@
+:host {
+  display: block;
+}
+
+nav {
+  overflow: auto;
+
+  paper-item.selected {
+    background-color: #ddd;
+  }
+
+  >paper-item > core-icon {
+    transition: transform 0.2s ease-in-out;
+  }
+
+  >paper-item.active {
+    > span {
+      font-weight: 500;
+    }
+
+    > core-icon {
+      transform: rotate(90deg);
+    }
+  }
+}
