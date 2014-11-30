@@ -2,24 +2,37 @@
   display: block;
 }
 
-nav {
+[navigation] {
   overflow: auto;
 
-  paper-item.selected {
-    background-color: #ddd;
+  core-toolbar {
+    color: white;
+    background-color: #3F51B5;
   }
 
-  >paper-item > core-icon {
-    transition: transform 0.2s ease-in-out;
+  paper-item {
+    margin-left: 2rem;
+
+    &.selected {
+      background-color: #ddd;
+    }
   }
 
-  >paper-item.active {
-    > span {
-      font-weight: 500;
+  >paper-item {
+    margin-left: 0;
+
+    &.active {
+      > span {
+        font-weight: 500;
+      }
+
+      > core-icon {
+        transform: rotate(90deg);
+      }
     }
 
     > core-icon {
-      transform: rotate(90deg);
+      transition: transform 0.2s ease-in-out;
     }
   }
 }

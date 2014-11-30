@@ -1,8 +1,10 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/core-header-panel/core-header-panel.html">
 <link rel="import" href="../../bower_components/core-scaffold/core-scaffold.html">
 <link rel="import" href="../../bower_components/core-icons/hardware-icons.html">
 <link rel="import" href="../../bower_components/core-menu/core-menu.html">
 <link rel="import" href="../../bower_components/core-menu/core-submenu.html">
+<link rel="import" href="../../bower_components/core-toolbar/core-toolbar.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../bower_components/paper-ripple/paper-ripple.html">
 <link rel="import" href="../elements.html">
@@ -10,14 +12,15 @@
 <polymer-element name="laboration-three" attributes="">
   <template>
     <style>
-      core-scaffold /deep/ core-toolbar {
+      core-scaffold::shadow /deep/ core-toolbar {
         display: none;
       }
     </style>
     <link rel="stylesheet" href="laboration-three.css">
     <sr-traffic response="{{response}}"></sr-traffic>
-    <core-scaffold>
-      <nav>
+    <core-scaffold fit>
+      <core-header-panel navigation flex>
+        <core-toolbar>SR Traffic</core-toolbar>
         <paper-item id="filters" on-click="{{menuClick}}"><span flex>Visa: {{filter.name}}</span><core-icon icon="hardware:keyboard-arrow-right"></core-icon></paper-item>
         <core-collapse>
           <core-selection id="filterSelection" on-core-select="{{selectFilter}}"></core-selection>
@@ -37,7 +40,7 @@
             <paper-item>{{message.title}}</paper-item>
           </template>
         </core-collapse>
-      </nav>
+      </core-header-panel>
       <traffic-map fit messages="{{response.messages | filterMessages(filter)}}"></traffic-map>
     </core-scaffold>
   </template>
