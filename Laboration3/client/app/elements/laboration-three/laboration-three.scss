@@ -2,12 +2,22 @@
   display: block;
 }
 
+core-scaffold::shadow #drawerPanel {
+  &[narrow] core-toolbar {
+    background-color: #009688;
+  }
+
+  &:not([narrow]) core-toolbar {
+    display: none;
+  }
+}
+
 [navigation] {
   overflow: auto;
 
   core-toolbar {
     color: white;
-    background-color: #3F51B5;
+    background-color: #009688;
   }
 
   paper-item {
@@ -34,5 +44,11 @@
     > core-icon {
       transition: transform 0.2s ease-in-out;
     }
+  }
+}
+
+@media (max-width: 600px) {
+  [navigation] core-toolbar {
+    display: none;
   }
 }

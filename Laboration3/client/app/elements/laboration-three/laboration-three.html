@@ -11,11 +11,6 @@
 
 <polymer-element name="laboration-three" attributes="">
   <template>
-    <style>
-      core-scaffold::shadow /deep/ core-toolbar {
-        display: none;
-      }
-    </style>
     <link rel="stylesheet" href="laboration-three.css">
     <sr-traffic response="{{response}}"></sr-traffic>
     <core-scaffold fit>
@@ -41,6 +36,7 @@
           </template>
         </core-collapse>
       </core-header-panel>
+      <span tool>SR Traffic</span>
       <traffic-map fit messages="{{response.messages | filterMessages(filter)}}"></traffic-map>
     </core-scaffold>
   </template>
