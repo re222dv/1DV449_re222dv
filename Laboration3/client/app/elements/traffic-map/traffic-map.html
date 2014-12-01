@@ -47,6 +47,13 @@
             marker.info.close();
           });
         },
+        showMessage: function (latitude, longitude) {
+          this.closeWindows();
+          this.$.map.setAttribute('latitude', latitude);
+          this.$.map.setAttribute('longitude', longitude);
+          var marker = this.$.map.querySelector('google-map-marker[latitude="'+latitude+'"][longitude="'+longitude+'"]');
+          marker.info.open(marker.map, marker.marker);
+        },
         styles: [
           {
             "featureType": "water",

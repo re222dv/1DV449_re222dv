@@ -31,13 +31,13 @@
         </core-collapse>
         <paper-item on-click="{{menuClick}}"><span flex>Meddelanden</span><core-icon icon="hardware:keyboard-arrow-right"></core-icon></paper-item>
         <core-collapse>
-          <template repeat="{{message in response.messages}}">
-            <paper-item>{{message.title}}</paper-item>
+          <template repeat="{{message, index in response.messages | filterMessages(filter)}}">
+            <paper-item on-click="{{messageClick}}" data-latitude="{{message.latitude}}" data-longitude="{{message.longitude}}">{{message.title}}</paper-item>
           </template>
         </core-collapse>
       </core-header-panel>
       <span tool>SR Traffic</span>
-      <traffic-map fit messages="{{response.messages | filterMessages(filter)}}"></traffic-map>
+      <traffic-map fit id="map" messages="{{response.messages | filterMessages(filter)}}"></traffic-map>
     </core-scaffold>
   </template>
   <script>
@@ -77,6 +77,11 @@
             if (!filter) return true;
             return +filter.value < 0 || filter.value == message.category;
           })
+        },
+        messageClick: function (event) {
+          var latitude = event.currentTarget.getAttribute('data-latitude');
+          var longitude = event.currentTarget.getAttribute('data-longitude');
+          this.$.map.showMessage(latitude, longitude);
         },
         domReady: function () {
           this.$.filterSelection.select(this.shadowRoot.querySelector('paper-item.filter'));
