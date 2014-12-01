@@ -1,0 +1,33 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/core-collapse/core-collapse.html">
+<link rel="import" href="../../bower_components/core-icons/hardware-icons.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+
+<polymer-element name="sub-menu" attributes="">
+  <template>
+    <link rel="stylesheet" href="sub-menu.css">
+    <paper-item id="button" on-click="{{menuClick}}">
+      <span flex><content select="span"></content></span>
+      <core-icon icon="hardware:keyboard-arrow-right"></core-icon>
+    </paper-item>
+    <core-collapse id="collapse">
+      <content select="*"></content>
+    </core-collapse>
+  </template>
+  <script>
+    (function () {
+
+      Polymer({
+        menuClick: function (event) {
+          event.currentTarget.classList.toggle('active');
+          event.currentTarget.nextElementSibling.toggle();
+        },
+        close: function () {
+          this.$.button.classList.remove('active');
+          this.$.collapse.opened = false;
+        }
+      });
+
+    })();
+  </script>
+</polymer-element>

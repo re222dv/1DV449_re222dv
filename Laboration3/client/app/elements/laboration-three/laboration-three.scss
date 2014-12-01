@@ -19,32 +19,6 @@ core-scaffold::shadow #drawerPanel {
     color: white;
     background-color: #009688;
   }
-
-  paper-item {
-    margin-left: 2rem;
-
-    &.selected {
-      background-color: #ddd;
-    }
-  }
-
-  >paper-item {
-    margin-left: 0;
-
-    &.active {
-      > span {
-        font-weight: 500;
-      }
-
-      > core-icon {
-        transform: rotate(90deg);
-      }
-    }
-
-    > core-icon {
-      transition: transform 0.2s ease-in-out;
-    }
-  }
 }
 
 @media (max-width: 600px) {

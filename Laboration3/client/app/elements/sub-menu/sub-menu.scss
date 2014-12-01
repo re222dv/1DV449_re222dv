@@ -1,0 +1,27 @@
+:host {
+  display: block;
+}
+
+::content paper-item {
+  margin-left: 2rem;
+
+  &[selected]{
+    background-color: #ddd;
+  }
+}
+
+paper-item {
+  &.active {
+    > span {
+      font-weight: 500;
+    }
+
+    > core-icon {
+      transform: rotate(90deg);
+    }
+  }
+
+  > core-icon {
+    transition: transform 0.2s ease-in-out;
+  }
+}

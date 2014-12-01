@@ -1,12 +1,8 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/core-header-panel/core-header-panel.html">
 <link rel="import" href="../../bower_components/core-scaffold/core-scaffold.html">
-<link rel="import" href="../../bower_components/core-icons/hardware-icons.html">
-<link rel="import" href="../../bower_components/core-menu/core-menu.html">
-<link rel="import" href="../../bower_components/core-menu/core-submenu.html">
 <link rel="import" href="../../bower_components/core-toolbar/core-toolbar.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
-<link rel="import" href="../../bower_components/paper-ripple/paper-ripple.html">
 <link rel="import" href="../elements.html">
 
 <polymer-element name="laboration-three" attributes="">
@@ -16,25 +12,27 @@
     <core-scaffold fit>
       <core-header-panel navigation flex>
         <core-toolbar>SR Traffic</core-toolbar>
-        <paper-item id="filters" on-click="{{menuClick}}"><span flex>Visa: {{filter.name}}</span><core-icon icon="hardware:keyboard-arrow-right"></core-icon></paper-item>
-        <core-collapse>
-          <core-selection id="filterSelection" on-core-select="{{selectFilter}}"></core-selection>
+        <sub-menu id="categoryMenu">
+          <span>Visa: {{filter.name}}</span>
           <template repeat="{{category in categories}}">
-            <paper-item class="filter" on-click="{{setFilter}}" data-value="{{category.value}}">{{category.name}}</paper-item>
+            <paper-item on-click="{{setCategory}}" data-value="{{category.value}}"
+                        selected?="{{category.value == filter.value}}">
+              {{category.name}}
+            </paper-item>
           </template>
-        </core-collapse>
-        <paper-item on-click="{{menuClick}}"><span flex>Områden</span><core-icon icon="hardware:keyboard-arrow-right"></core-icon></paper-item>
-        <core-collapse>
+        </sub-menu>
+        <sub-menu>
+          <span>Områden</span>
           <template repeat="{{message in response.messages}}">
             <paper-item>{{message.title}}</paper-item>
           </template>
-        </core-collapse>
-        <paper-item on-click="{{menuClick}}"><span flex>Meddelanden</span><core-icon icon="hardware:keyboard-arrow-right"></core-icon></paper-item>
-        <core-collapse>
+        </sub-menu>
+        <sub-menu>
+          <span>Meddelanden</span>
           <template repeat="{{message, index in response.messages | filterMessages(filter)}}">
             <paper-item on-click="{{messageClick}}" data-latitude="{{message.latitude}}" data-longitude="{{message.longitude}}">{{message.title}}</paper-item>
           </template>
-        </core-collapse>
+        </sub-menu>
       </core-header-panel>
       <span tool>SR Traffic</span>
       <traffic-map fit id="map" messages="{{response.messages | filterMessages(filter)}}"></traffic-map>
@@ -53,23 +51,12 @@
             {value: 3, name: 'Övrigt'}
           ];
         },
-        menuClick: function (event) {
-          event.currentTarget.classList.toggle('active');
-          event.currentTarget.nextElementSibling.toggle();
-        },
-        setFilter: function(event) {
-          this.$.filterSelection.select(event.target);
-          this.$.filters.classList.remove('active');
-          this.$.filters.nextElementSibling.opened = false;
+        setCategory: function(event) {
+          this.$.categoryMenu.close();
+          this.filter = this.categories.filter(function (category) {
+            return category.value == event.currentTarget.getAttribute('data-value');
+          })[0];
           event.stopPropagation();
-        },
-        selectFilter: function(event, detail) {
-          detail.item.classList.toggle('selected', detail.isSelected);
-          if (detail.isSelected) {
-            this.filter = this.categories.filter(function (category) {
-              return category.value == detail.item.getAttribute('data-value');
-            })[0];
-          }
         },
         filterMessages: function (messages, filter) {
           if (!messages) return messages;
@@ -83,8 +70,8 @@
           var longitude = event.currentTarget.getAttribute('data-longitude');
           this.$.map.showMessage(latitude, longitude);
         },
-        domReady: function () {
-          this.$.filterSelection.select(this.shadowRoot.querySelector('paper-item.filter'));
+        attached: function () {
+          this.filter = this.categories[0];
         }
       });
 
