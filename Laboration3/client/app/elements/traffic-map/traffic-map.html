@@ -4,26 +4,27 @@
 
 <polymer-element name="traffic-map" attributes="messages">
   <template>
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
+    <link rel="stylesheet" href="traffic-map.css">
     <google-map fit fitToMarkers disableDefaultUI on-mousedown="{{closeWindows}}" id="map" styles="{{styles}}">
       <template repeat="{{message in messages}}">
         <google-map-marker latitude="{{message.latitude}}" longitude="{{message.longitude}}">
           <h3>{{message.title}}</h3>
-          <div layout horizontal center>
+          <div layout horizontal center class="infoline">
             <span>{{message.category | category}}</span>
             |
             <span>{{message.subcategory}}</span>
             |
-            <time>{{message.createddate | humanTime}}</time>
+            <span>
+              <time is="relative-time" datetime="{{message.createddate | isoDate}}">
+                {{message.createddate | humanTime}}
+              </time>
+            </span>
           </div>
           <p>{{message.description}}</p>
         </google-map-marker>
       </template>
     </google-map>
+    <script src="../../bower_components/time-elements/time-elements.js"></script>
   </template>
   <script>
     (function () {
@@ -36,6 +37,10 @@
         humanTime: function (value) {
           var date = new Date(+value.slice(6, -7));
           return date.toLocaleString();
+        },
+        isoDate: function (value) {
+          var date = new Date(+value.slice(6, -7));
+          return date.toISOString();
         },
         closeWindows: function () {
           [].slice.apply(this.$.map.querySelectorAll('google-map-marker')).forEach(function(marker) {

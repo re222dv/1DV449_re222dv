@@ -290,7 +290,7 @@ module.exports = function (grunt) {
       'copy:styles',
       'autoprefixer:server',
       'connect:livereload',
-      'open',
+      //'open',
       'watch'
     ]);
   });
