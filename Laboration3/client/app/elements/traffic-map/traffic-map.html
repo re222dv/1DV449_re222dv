@@ -35,11 +35,11 @@
           return ['Vägtrafik', 'Kollektivtrafik', 'Planerad störning', 'Övrigt'][value];
         },
         humanTime: function (value) {
-          var date = new Date(+value.slice(6, -7));
+          var date = new Date(value);
           return date.toLocaleString();
         },
         isoDate: function (value) {
-          var date = new Date(+value.slice(6, -7));
+          var date = new Date(value);
           return date.toISOString();
         },
         closeWindows: function () {
