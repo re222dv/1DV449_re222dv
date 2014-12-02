@@ -33,7 +33,6 @@ function getData() {
         var cachedData = JSON.parse(content);
 
         if (Date.now() - cachedData.timestamp < FIVE_MINUTES) {
-            console.log('cached');
             return cachedData.data;
         }
 

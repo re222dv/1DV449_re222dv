@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="traffic-map.css">
     <google-map fit fitToMarkers disableDefaultUI on-mousedown="{{closeWindows}}" id="map" styles="{{styles}}">
       <template repeat="{{message in messages}}">
-        <google-map-marker latitude="{{message.latitude}}" longitude="{{message.longitude}}">
+        <google-map-marker latitude="{{message.latitude}}" longitude="{{message.longitude}}" icon="{{icon(message.priority)}}">
           <h3>{{message.title}}</h3>
           <div layout horizontal center class="infoline">
             <span>{{message.category | category}}</span>
@@ -33,6 +33,15 @@
       Polymer({
         category: function (value) {
           return ['Vägtrafik', 'Kollektivtrafik', 'Planerad störning', 'Övrigt'][value];
+        },
+        icon: function (value) {
+          return ['',
+            '/images/marker-amber-900.png',
+            '/images/marker-amber-600.png',
+            '/images/marker-amber-300.png',
+            '/images/marker-teal-500.png',
+            '/images/marker-teal-300.png',
+          ][value];
         },
         humanTime: function (value) {
           var date = new Date(value);
