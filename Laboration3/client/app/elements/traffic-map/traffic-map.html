@@ -3,10 +3,10 @@
 <link rel="import" href="../elements.html">
 <script src="../../bower_components/time-elements/time-elements.js"></script>
 
-<polymer-element name="traffic-map" attributes="messages">
+<polymer-element name="traffic-map" attributes="messages map">
   <template>
     <link rel="stylesheet" href="traffic-map.css">
-    <google-map fit fitToMarkers disableDefaultUI on-mousedown="{{closeWindows}}" id="map" styles="{{styles}}">
+    <google-map fit fitToMarkers disableDefaultUI on-mousedown="{{closeWindows}}" id="map" map="{{map}}" styles="{{styles}}">
       <template repeat="{{message in messages}}">
         <google-map-marker latitude="{{message.latitude}}" longitude="{{message.longitude}}" icon="{{icon(message.priority)}}">
           <h3>{{message.title}}</h3>
@@ -55,6 +55,12 @@
           [].slice.apply(this.$.map.querySelectorAll('google-map-marker')).forEach(function(marker) {
             marker.info.close();
           });
+        },
+        showArea: function (latitude, longitude, zoom) {
+          this.closeWindows();
+          this.$.map.setAttribute('latitude', latitude);
+          this.$.map.setAttribute('longitude', longitude);
+          this.$.map.setAttribute('zoom', zoom);
         },
         showMessage: function (latitude, longitude) {
           this.closeWindows();

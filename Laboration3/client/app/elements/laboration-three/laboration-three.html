@@ -8,7 +8,7 @@
 <polymer-element name="laboration-three" attributes="">
   <template>
     <link rel="stylesheet" href="laboration-three.css">
-    <sr-traffic response="{{response}}"></sr-traffic>
+    <sr-traffic response="{{response}}" map="{{map}}"></sr-traffic>
     <core-scaffold fit>
       <core-header-panel navigation flex>
         <core-toolbar>SR Traffic</core-toolbar>
@@ -24,7 +24,7 @@
         <sub-menu>
           <span>Områden</span>
           <template repeat="{{area in response.areas}}">
-            <paper-item>{{area.name}}</paper-item>
+            <paper-item on-click="{{areaClick}}" data-latitude="{{area.latitude}}" data-longitude="{{area.longitude}}" data-zoom="{{area.zoom}}">{{area.name}}</paper-item>
           </template>
         </sub-menu>
         <sub-menu>
@@ -35,7 +35,7 @@
         </sub-menu>
       </core-header-panel>
       <span tool>SR Traffic</span>
-      <traffic-map fit id="map" messages="{{response.messages | filterMessages(filter)}}"></traffic-map>
+      <traffic-map fit id="map" messages="{{response.messages | filterMessages(filter)}}" map="{{map}}"></traffic-map>
     </core-scaffold>
   </template>
   <script>
@@ -64,6 +64,12 @@
             if (!filter) return true;
             return +filter.value < 0 || filter.value == message.category;
           })
+        },
+        areaClick: function (event) {
+          var latitude = event.currentTarget.getAttribute('data-latitude');
+          var longitude = event.currentTarget.getAttribute('data-longitude');
+          var zoom = event.currentTarget.getAttribute('data-zoom');
+          this.$.map.showArea(latitude, longitude, zoom);
         },
         messageClick: function (event) {
           var latitude = event.currentTarget.getAttribute('data-latitude');

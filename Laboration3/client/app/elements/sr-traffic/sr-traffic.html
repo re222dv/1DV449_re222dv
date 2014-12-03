@@ -1,7 +1,8 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/core-ajax/core-ajax.html">
+<link rel="import" href="../../bower_components/google-map/google-map-search.html">
 
-<polymer-element name="sr-traffic" attributes="response">
+<polymer-element name="sr-traffic" attributes="response map">
   <template>
     <style>
       :host {
@@ -9,15 +10,39 @@
       }
     </style>
     <core-ajax url="http://127.0.0.1:9099/traffic" response="{{response}}" handleAs="json" auto on-core-response="{{resp}}"></core-ajax>
+    <core-ajax url="http://127.0.0.1:9099/area" method="post" id="post" contentType="application/json"></core-ajax>
+    <google-map-search map="{{map}}" id="map" result="{{result}}"></google-map-search>
   </template>
   <script>
     (function () {
       'use strict';
 
-      Polymer({
-        get messages() {return (this.response || {}).messages},
+      var areasWithoutLocation = [];
+
+        Polymer({
         resp: function (e) {
-          console.log(e.detail.response);
+          areasWithoutLocation = this.response.areas.filter(function (area) {
+            return area['longitude'] == undefined && area['latitude'] == undefined;
+          });
+
+          this.searchArea();
+        },
+        searchArea: function () {
+          if (areasWithoutLocation.length) {
+            this.currentArea = areasWithoutLocation.pop();
+            this.$.map.setAttribute('query', this.currentArea.name);
+          }
+        },
+        resultChanged: function () {
+          this.currentArea.longitude = this.result.longitude;
+          this.currentArea.latitude = this.result.latitude;
+          this.$.post.setAttribute('body', JSON.stringify({
+            name: this.currentArea.name,
+            longitude: this.currentArea.longitude,
+            latitude: this.currentArea.latitude,
+          }));
+          this.$.post.go();
+          this.searchArea();
         }
       });
 

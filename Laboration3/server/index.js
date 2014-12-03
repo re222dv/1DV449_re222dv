@@ -20,6 +20,18 @@ server.route({
     }
 });
 
+server.route({
+    path: '/area',
+    method: 'POST',
+    handler: function(req, reply) {
+        updateArea(req.payload.name, req.payload.longitude, req.payload.latitude).then(function () {
+            reply('saved');
+        }, function(err) {
+            throw err;
+        });
+    }
+});
+
 function cacheData(areas, messages) {
     var data = {areas: areas, messages: messages, timestamp: Date.now()};
     return fs.writeFile('cache', JSON.stringify(data)).then(function () {
@@ -53,6 +65,22 @@ function getData() {
     });
 }
 
+function updateArea(name, longitude, latitude) {
+    return fs.readFile('cache').then(function(content) {
+        var cachedData = JSON.parse(content);
+
+        cachedData.areas.filter(function (area) {
+            return area.name == name;
+        })
+        .map(function (area) {
+            area.longitude = longitude;
+            area.latitude = latitude;
+            return area;
+        });
+        return fs.writeFile('cache', JSON.stringify(cachedData));
+    });
+}
+
 function getAreas(timestamp) {
     if (Date.now() - timestamp < SIX_MONTHS) {
         var deferred = new promise.Deferred();
@@ -60,7 +88,7 @@ function getAreas(timestamp) {
         return deferred.promise;
     }
 
-    return getRequest('http://api.sr.se/api/v2/traffic/areas?format=json', timestamp).then(function (data) {
+    return getRequest('http://api.sr.se/api/v2/traffic/areas?size=100&format=json', timestamp).then(function (data) {
         return data.areas;
     });
 }
