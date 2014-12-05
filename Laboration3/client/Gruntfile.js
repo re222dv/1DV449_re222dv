@@ -192,7 +192,8 @@ module.exports = function (grunt) {
     vulcanize: {
       default: {
         options: {
-          strip: true
+          strip: true,
+          inline: true
         },
         files: {
           '<%= yeoman.dist %>/elements/elements.vulcanized.html': [
@@ -258,6 +259,27 @@ module.exports = function (grunt) {
         editor: function(contents) {
           return contents.replace(/http:\/\/127\.0\.0\.1:9099/g, '');
         }
+      },
+      polyfill: {
+        src: '<%= yeoman.dist %>/index.html',
+        editor: function(contents) {
+          return contents.replace(/bower_components\/webcomponentsjs\/webcomponents\.js/g,
+                                  'bower_components/webcomponentsjs/webcomponents.min.js');
+        }
+      },
+      comments: {
+        src: '<%= yeoman.dist %>/elements/elements.vulcanized.html',
+        editor: function(contents) {
+          return contents.replace(/<!--[^]*?-->/g, '');
+        }
+      }
+    },
+    inline: {
+      dist: {
+        options:{
+          cssmin: true
+        },
+        src: ['<%= yeoman.dist %>/index.html']
       }
     },
     // See this tutorial if you'd like to run PageSpeed
@@ -318,9 +340,13 @@ module.exports = function (grunt) {
     'concat',
     'autoprefixer',
     'uglify',
+    'cssmin',
     'vulcanize',
     'usemin',
-    'minifyHtml'
+    'minifyHtml',
+    'rewrite:polyfill',
+    'rewrite:comments',
+    'inline'
   ]);
 
   grunt.registerTask('default', [
