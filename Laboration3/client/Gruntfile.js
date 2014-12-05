@@ -23,12 +23,14 @@ module.exports = function (grunt) {
     dist: 'dist'
   };
 
+  var jsHintOptions = JSON.parse(grunt.file.read('.jshintrc'));
+
   grunt.initConfig({
     yeoman: yeomanConfig,
     watch: {
       options: {
         nospawn: true,
-        livereload: { liveCSS: false }
+        livereload: {liveCSS: false}
       },
       livereload: {
         options: {
@@ -60,6 +62,12 @@ module.exports = function (grunt) {
           '<%= yeoman.app %>/elements/{,*/}*.{scss,sass}'
         ],
         tasks: ['sass:server', 'autoprefixer:server']
+      },
+      lint: {
+        files: [
+          '<%= yeoman.app %>/index.html',
+        ],
+        tasks: ['copy:lint', 'rewrite:lint']
       }
     },
     // Compiles Sass to CSS and generates necessary files if requested
@@ -171,6 +179,22 @@ module.exports = function (grunt) {
         'test/spec/{,*/}*.js'
       ]
     },
+    inlinelint: {
+      html: [
+        '<%= yeoman.app %>/**/*.html',
+        '!<%= yeoman.app %>/bower_components/**/*.html',
+        '!<%= yeoman.app %>/test/**/*.html'
+      ],
+      options: jsHintOptions,
+    },
+    jscs: {
+      files: [
+        '<%= yeoman.app %>/**/*.js'
+      ],
+      options: {
+        config: '.jscsrc'
+      }
+    },
     useminPrepare: {
       html: '<%= yeoman.app %>/index.html',
       options: {
@@ -251,26 +275,39 @@ module.exports = function (grunt) {
           dest: '.tmp',
           src: ['{styles,elements}/{,*/}*.css']
         }]
+      },
+      lint: {
+        files: [{
+          expand: true,
+          flatten: true,
+          dest: '.tmp',
+          src: [
+            '<%= yeoman.app %>/index.html',
+            'tools/*.js'
+          ]
+        }]
       }
     },
     rewrite: {
       localhost: {
         src: '<%= yeoman.dist %>/elements/**/*',
-        editor: function(contents) {
+        editor: function (contents) {
           return contents.replace(/http:\/\/127\.0\.0\.1:9099/g, '');
         }
       },
       polyfill: {
         src: '<%= yeoman.dist %>/index.html',
-        editor: function(contents) {
+        editor: function (contents) {
           return contents.replace(/bower_components\/webcomponentsjs\/webcomponents\.js/g,
                                   'bower_components/webcomponentsjs/webcomponents.min.js');
         }
       },
-      comments: {
-        src: '<%= yeoman.dist %>/elements/elements.vulcanized.html',
-        editor: function(contents) {
-          return contents.replace(/<!--[^]*?-->/g, '');
+      lint: {
+        src: '.tmp/index.html',
+        editor: function (contents) {
+          return contents.replace(/<\/body>/g, '\
+            <script src="unregistered-elements.js"></script>\
+            </body>');
         }
       }
     },
@@ -283,7 +320,8 @@ module.exports = function (grunt) {
       }
     },
     // See this tutorial if you'd like to run PageSpeed
-    // against localhost: http://www.jamescryer.com/2014/06/12/grunt-pagespeed-and-ngrok-locally-testing/
+    // against localhost:
+    //    http://www.jamescryer.com/2014/06/12/grunt-pagespeed-and-ngrok-locally-testing/
     pagespeed: {
       options: {
         // By default, we use the PageSpeed Insights
@@ -295,9 +333,9 @@ module.exports = function (grunt) {
       // Update `url` below to the public URL for your site
       mobile: {
         options: {
-          url: "https://developers.google.com/web/fundamentals/",
-          locale: "en_GB",
-          strategy: "mobile",
+          url: 'https://developers.google.com/web/fundamentals/',
+          locale: 'en_GB',
+          strategy: 'mobile',
           threshold: 80
         }
       }
@@ -318,9 +356,11 @@ module.exports = function (grunt) {
       'clean:server',
       'sass:server',
       'copy:styles',
+      'copy:lint',
       'autoprefixer:server',
       'connect:livereload',
       //'open',
+      'rewrite:lint',
       'watch'
     ]);
   });
@@ -328,6 +368,12 @@ module.exports = function (grunt) {
   grunt.registerTask('test', [
     'clean:server',
     'connect:test'
+  ]);
+
+  grunt.registerTask('lint', [
+    'jshint',
+    'inlinelint',
+    'jscs'
   ]);
 
   grunt.registerTask('build', [
@@ -345,7 +391,6 @@ module.exports = function (grunt) {
     'usemin',
     'minifyHtml',
     'rewrite:polyfill',
-    //'rewrite:comments',
     'inline'
   ]);
 

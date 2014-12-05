@@ -40,6 +40,7 @@
   </template>
   <script>
     (function () {
+      'use strict';
 
       Polymer({
         get categories() {
@@ -54,7 +55,7 @@
         setCategory: function(event) {
           this.$.categoryMenu.close();
           this.filter = this.categories.filter(function (category) {
-            return category.value == event.currentTarget.getAttribute('data-value');
+            return category.value === +event.currentTarget.getAttribute('data-value');
           })[0];
           event.stopPropagation();
         },
@@ -62,8 +63,8 @@
           if (!messages) return messages;
           return messages.filter(function (message) {
             if (!filter) return true;
-            return +filter.value < 0 || filter.value == message.category;
-          })
+            return +filter.value < 0 || +filter.value === +message.category;
+          });
         },
         areaClick: function (event) {
           var latitude = event.currentTarget.getAttribute('data-latitude');

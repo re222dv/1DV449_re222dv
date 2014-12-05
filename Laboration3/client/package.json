@@ -16,6 +16,8 @@
     "grunt-contrib-uglify": "~0.5.0",
     "grunt-contrib-watch": "~0.6.1",
     "grunt-inline": "^0.3.2",
+    "grunt-jscs": "^1.0.0",
+    "grunt-lint-inline": "^0.4.3",
     "grunt-minify-html": "^0.1.0",
     "grunt-open": "~0.2.3",
     "grunt-pagespeed": "~0.3.0",
@@ -24,6 +26,7 @@
     "grunt-sass": "~0.14.0",
     "grunt-usemin": "~2.3.0",
     "grunt-vulcanize": "~0.3.0",
+    "jscs": "^1.8.1",
     "jshint-stylish": "~0.4.0",
     "load-grunt-tasks": "~0.6.0",
     "time-grunt": "~0.4.0"

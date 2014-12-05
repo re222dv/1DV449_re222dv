@@ -22,7 +22,7 @@
       Polymer({
         resp: function () {
           areasWithoutLocation = this.response.areas.filter(function (area) {
-            return area['longitude'] == undefined && area['latitude'] == undefined;
+            return area.longitude === undefined && area.latitude === undefined;
           });
 
           this.searchArea();

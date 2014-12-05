@@ -1,0 +1,17 @@
+{
+  "preset": "crockford",
+  "requireParenthesesAroundIIFE": true,
+  "maximumLineLength": 100,
+  "validateLineBreaks": "LF",
+  "validateIndentation": 2,
+  "disallowKeywords": ["with"],
+  "disallowSpacesInsideObjectBrackets": true,
+  "disallowImplicitTypeConversion": ["string"],
+  "disallowTrailingComma": null,
+  "requireMultipleVarDecl": null,
+  "requireCurlyBraces": null,
+  "safeContextKeyword": "_this",
+  "excludeFiles": [
+    "app/bower_components/**"
+  ]
+}
