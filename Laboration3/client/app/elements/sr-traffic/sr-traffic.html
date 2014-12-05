@@ -9,8 +9,8 @@
         display: none;
       }
     </style>
-    <core-ajax url="http://127.0.0.1:9099/traffic" response="{{response}}" handleAs="json" auto on-core-response="{{resp}}"></core-ajax>
-    <core-ajax url="http://127.0.0.1:9099/area" method="post" id="post" contentType="application/json"></core-ajax>
+    <core-ajax url="http://127.0.0.1:9099/api/traffic" response="{{response}}" handleAs="json" auto on-core-response="{{resp}}"></core-ajax>
+    <core-ajax url="http://127.0.0.1:9099/api/area" method="post" id="post" contentType="application/json"></core-ajax>
     <google-map-search map="{{map}}" id="map" result="{{result}}"></google-map-search>
   </template>
   <script>

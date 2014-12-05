@@ -6,10 +6,10 @@ var request = require('request');
 const FIVE_MINUTES = 1000 * 60 * 5;
 const SIX_MONTHS = 1000 * 60 * 60 * 24 * 30 * 6;
 
-var server = new Hapi.Server(9099, { cors: true });
+var server = new Hapi.Server('127.0.0.1', 9099, { cors: true });
 
 server.route({
-    path: '/traffic',
+    path: '/api/traffic',
     method: 'GET',
     handler: function(_, reply) {
         getData().then(function (data) {
@@ -21,7 +21,7 @@ server.route({
 });
 
 server.route({
-    path: '/area',
+    path: '/api/area',
     method: 'POST',
     handler: function(req, reply) {
         updateArea(req.payload.name, req.payload.longitude, req.payload.latitude).then(function () {

@@ -252,6 +252,14 @@ module.exports = function (grunt) {
         }]
       }
     },
+    rewrite: {
+      localhost: {
+        src: '<%= yeoman.dist %>/elements/**/*',
+        editor: function(contents) {
+          return contents.replace(/http:\/\/127\.0\.0\.1:9099/g, '');
+        }
+      }
+    },
     // See this tutorial if you'd like to run PageSpeed
     // against localhost: http://www.jamescryer.com/2014/06/12/grunt-pagespeed-and-ngrok-locally-testing/
     pagespeed: {
@@ -304,6 +312,7 @@ module.exports = function (grunt) {
     'clean:dist',
     'sass',
     'copy',
+    'rewrite:localhost',
     'useminPrepare',
     'imagemin',
     'concat',
