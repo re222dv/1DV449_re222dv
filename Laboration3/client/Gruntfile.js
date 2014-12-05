@@ -221,7 +221,7 @@ module.exports = function (grunt) {
         files: [{
           expand: true,
           cwd: '<%= yeoman.dist %>',
-          src: '*.html',
+          src: '**/*.html',
           dest: '<%= yeoman.dist %>'
         }]
       }
@@ -345,7 +345,7 @@ module.exports = function (grunt) {
     'usemin',
     'minifyHtml',
     'rewrite:polyfill',
-    'rewrite:comments',
+    //'rewrite:comments',
     'inline'
   ]);
 
