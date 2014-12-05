@@ -42,15 +42,17 @@
     (function () {
       'use strict';
 
+      var categories = [
+        {value: -1, name: 'Alla'},
+        {value: 0, name: 'Vägtrafik'},
+        {value: 1, name: 'Kollektivtrafik'},
+        {value: 2, name: 'Planerad störning'},
+        {value: 3, name: 'Övrigt'}
+      ];
+
       Polymer({
         get categories() {
-          return [
-            {value: -1, name: 'Alla'},
-            {value: 0, name: 'Vägtrafik'},
-            {value: 1, name: 'Kollektivtrafik'},
-            {value: 2, name: 'Planerad störning'},
-            {value: 3, name: 'Övrigt'}
-          ];
+          return categories;
         },
         setCategory: function(event) {
           this.$.categoryMenu.close();

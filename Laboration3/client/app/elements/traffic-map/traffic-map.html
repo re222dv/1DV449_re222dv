@@ -29,9 +29,11 @@
     (function () {
       'use strict';
 
+      var categories = ['Vägtrafik', 'Kollektivtrafik', 'Planerad störning', 'Övrigt'];
+
       Polymer({
         category: function (value) {
-          return ['Vägtrafik', 'Kollektivtrafik', 'Planerad störning', 'Övrigt'][value];
+          return categories[value];
         },
         icon: function (value) {
           return ['',
