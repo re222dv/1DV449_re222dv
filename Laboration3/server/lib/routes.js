@@ -6,25 +6,13 @@ export var routes = [
   {
     path: '/api/traffic',
     method: 'GET',
-    handler: function (_, reply) {
-      getData()
-        .then(function (data) {
-          reply(data);
-        }, function (err) {
-          throw err;
-        });
-    }
+    handler: (_, reply) => getData().then(reply),
   },
   {
     path: '/api/area',
     method: 'POST',
-    handler: function (req, reply) {
-      updateArea(req.payload.name, req.payload.longitude, req.payload.latitude)
-        .then(function () {
-          reply('saved');
-        }, function (err) {
-          throw err;
-        });
-    }
+    handler: (request, reply) =>
+      updateArea(request.payload.name, request.payload.longitude, request.payload.latitude)
+        .then(() => reply('saved')),
   },
 ];
