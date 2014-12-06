@@ -2,7 +2,7 @@
   display: block;
 }
 
-::content paper-item {
+::content paper-item:not(#button) {
   margin-left: 2rem;
 
   &[selected]{
@@ -10,7 +10,7 @@
   }
 }
 
-paper-item {
+paper-item#button {
   &.active {
     > span {
       font-weight: 500;

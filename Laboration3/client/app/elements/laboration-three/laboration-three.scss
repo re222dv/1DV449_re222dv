@@ -7,7 +7,7 @@ core-scaffold::shadow #drawerPanel {
     background-color: #009688;
   }
 
-  &:not([narrow]) core-toolbar {
+  &:not([narrow]) core-toolbar:not(.drawer) {
     display: none;
   }
 }
