@@ -13,7 +13,17 @@
   <link rel="stylesheet" href="styles/main.css">
   <!-- endbuild-->
 
-  <script src="bower_components/webcomponentsjs/webcomponents.js"></script>
+  <script id="polyfill">
+    if (!('registerElement' in document) ||
+        !('createShadowRoot' in HTMLElement.prototype) ||
+        !('import' in document.createElement('link')) ||
+        !('content' in document.createElement('template'))) {
+      var polyfills = document.createElement('script');
+      polyfills.setAttribute('src', 'bower_components/webcomponentsjs/webcomponents.js');
+      var firstImport = document.querySelector('link[rel="import"]');
+      document.head.insertBefore(polyfills, firstImport);
+    }
+  </script>
   <!-- build:vulcanized elements/elements.vulcanized.html -->
   <link rel="import" href="bower_components/font-roboto/roboto.html">
   <link rel="import" href="elements/elements.html">
