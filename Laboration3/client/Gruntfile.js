@@ -23,7 +23,7 @@ module.exports = function (grunt) {
     dist: 'dist'
   };
 
-  var jsHintOptions = JSON.parse(grunt.file.read('.jshintrc'));
+  var jsHintOptions = JSON.parse(grunt.file.read('../.jshintrc'));
 
   grunt.initConfig({
     yeoman: yeomanConfig,

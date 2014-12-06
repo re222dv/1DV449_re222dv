@@ -1,4 +1,5 @@
 {
+  "esnext": true,
   "preset": "crockford",
   "requireParenthesesAroundIIFE": true,
   "maximumLineLength": 100,
@@ -8,10 +9,11 @@
   "disallowSpacesInsideObjectBrackets": true,
   "disallowImplicitTypeConversion": ["string"],
   "disallowTrailingComma": null,
+  "disallowSpaceBeforeBinaryOperators": null,
   "requireMultipleVarDecl": null,
   "requireCurlyBraces": null,
-  "safeContextKeyword": "_this",
+  "safeContextKeyword": "that",
   "excludeFiles": [
-    "app/bower_components/**"
+    "client/app/bower_components/**"
   ]
 }
