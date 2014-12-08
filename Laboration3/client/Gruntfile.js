@@ -389,7 +389,7 @@ module.exports = function (grunt) {
     'cssmin',
     'vulcanize',
     'usemin',
-    'minifyHtml',
+    //'minifyHtml',
     'rewrite:polyfill',
     'inline'
   ]);
