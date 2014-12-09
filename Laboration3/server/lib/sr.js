@@ -101,6 +101,12 @@ export function getData() {
 }
 
 export function updateArea(name, longitude, latitude) {
+  if (isNaN(longitude) || isNaN(latitude)) {
+    let deferred = new promise.Deferred();
+    deferred.resolve(null);
+    return deferred.promise;
+  }
+
   return fs.readFile('cache')
     .then(content => {
       let cachedData = JSON.parse(content);
@@ -108,6 +114,8 @@ export function updateArea(name, longitude, latitude) {
       cachedData.areas
         .filter(area => area.name === name)
         .map(area => {
+          if (area.longitude !== undefined && area.longitude !== undefined) return area;
+
           area.longitude = longitude;
           area.latitude = latitude;
           return area;
