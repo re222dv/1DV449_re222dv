@@ -1,3 +1,4 @@
 [submodule "Project"]
-path = Project
-url = https://github.com/re222dv/1DV449_re222dv.git
+	path = MuVi
+	url = https://github.com/re222dv/MuVi.git
+	branch = master
