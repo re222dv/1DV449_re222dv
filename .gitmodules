@@ -1,4 +1,4 @@
 [submodule "Project"]
-	path = Project
+	path = MuVi
 	url = https://github.com/re222dv/MuVi.git
 	branch = master
